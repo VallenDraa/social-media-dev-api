@@ -1,5 +1,5 @@
 import { type User, type Comment, type Post } from '../models';
-import { type UUID } from '../types';
+import { type UUID } from 'crypto';
 import { faker } from '@faker-js/faker';
 
 export const createFakeUser = (): User => ({
@@ -16,7 +16,7 @@ export const createFakeUser = (): User => ({
 		.toISOString(),
 });
 
-export const createPost = ({
+export const createFakePost = ({
 	ownerId,
 	likes,
 	dislikes,
@@ -27,7 +27,7 @@ export const createPost = ({
 }): Post => ({
 	id: crypto.randomUUID(),
 	description: faker.lorem.paragraph(),
-	images: Array<string>(faker.number.int({ min: 1, max: 5 })).fill(
+	images: [...Array<string>(faker.number.int({ min: 1, max: 5 }))].map(() =>
 		faker.image.urlLoremFlickr(),
 	),
 	owner: ownerId,

@@ -1,10 +1,12 @@
+import { type UUID } from 'crypto';
+
 export type Comment = {
-	id: string;
+	id: UUID;
 	content: string;
-	post: string;
-	owner: string;
-	likes: string[];
-	dislikes: string[];
+	post: UUID;
+	owner: UUID;
+	likes: UUID[];
+	dislikes: UUID[];
 	replies: string[];
 	createdAt: string;
 	updatedAt: string;

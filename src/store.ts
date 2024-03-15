@@ -1,33 +1,36 @@
+import { type Comment, type User, type Post } from './models';
+
 export type Store = {
 	state: {
-		products: string[];
+		users: User[];
+		posts: Post[];
+		comments: Comment[];
 	};
-
-	getState: (
-		stateKey: keyof Store['state'],
-	) => Store['state'][keyof Store['state']];
-
+	getState: () => Store['state'];
 	setState: (updater: (state: Store['state']) => Store['state']) => void;
-
 	resetStore: () => void;
 };
 
 export const store: Store = {
 	state: {
-		products: [],
+		users: [],
+		comments: [],
+		posts: [],
 	},
 
-	getState(stateKey) {
-		return this.state[stateKey];
+	getState() {
+		return this.state;
 	},
 
 	setState(updater) {
-		this.state = updater(this.state);
+		this.state = updater(structuredClone(this.state));
 	},
 
 	resetStore() {
 		this.state = {
-			products: [],
+			users: [],
+			comments: [],
+			posts: [],
 		};
 	},
 };
