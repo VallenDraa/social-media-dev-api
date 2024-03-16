@@ -40,10 +40,6 @@ export const editPostValidator = Joi.object<PostEdit, true>({
 		.items(Joi.string().uri())
 		.required()
 		.messages({ 'any.required': 'Images are invalid or missing' }),
-	owner: Joi.string()
-		.uuid()
-		.required()
-		.messages({ 'any.required': 'Owner is invalid or missing' }),
 });
 
 export const postValidator = createPostValidator.append<Post>({
