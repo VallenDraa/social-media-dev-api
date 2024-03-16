@@ -10,8 +10,8 @@ import { type MetaData, type ApiResponse } from 'src/models/response.model';
 import { type UUID } from 'crypto';
 
 export const postController = {
-	createPost(req: Request, h: ResponseToolkit) {
-		const post = postService.createPost(req.payload as PostCreate);
+	addPost(req: Request, h: ResponseToolkit) {
+		const post = postService.addPost(req.payload as PostCreate);
 
 		const response: ApiResponse<{ post: Post }> = {
 			statusCode: 201,
@@ -65,11 +65,11 @@ export const postController = {
 	},
 
 	deletePost(req: Request, h: ResponseToolkit) {
-		const params = req.params as { id: string };
+		const params = req.params as { id: UUID };
 
 		const postId = postService.deletePost(params.id);
 
-		const response: ApiResponse<{ postId: string }> = {
+		const response: ApiResponse<{ postId: UUID }> = {
 			statusCode: 200,
 			message: 'Post deleted successfully',
 			data: { postId },

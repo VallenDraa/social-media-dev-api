@@ -6,7 +6,7 @@ import Boom from '@hapi/boom';
 import { paginateService } from './pagination.service';
 
 export const postService = {
-	createPost(newPostData: PostCreate) {
+	addPost(newPostData: PostCreate) {
 		const createdAt = new Date().toISOString();
 
 		const newPost: Post = {
@@ -27,7 +27,7 @@ export const postService = {
 		return paginateService.paginate(allPosts, limit, page);
 	},
 
-	getPostById(id: string) {
+	getPostById(id: UUID) {
 		const post = postRepository.getPostById(store, id);
 
 		if (!post) {
@@ -38,8 +38,10 @@ export const postService = {
 	},
 
 	updatePost(id: UUID, updatedPostData: PostEdit) {
+		const post = this.getPostById(id);
+
 		const updatedPost: Post = {
-			id,
+			...post,
 			...updatedPostData,
 			updatedAt: new Date().toISOString(),
 		};
@@ -53,7 +55,7 @@ export const postService = {
 		return updatedPost;
 	},
 
-	deletePost(id: string) {
+	deletePost(id: UUID) {
 		const isDeleted = postRepository.deletePost(store, id);
 
 		if (!isDeleted) {

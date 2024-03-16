@@ -1,3 +1,4 @@
+import { type UUID } from 'crypto';
 import { type PostDetail, type Post } from 'src/models';
 import { type Store } from 'src/store';
 
@@ -11,7 +12,7 @@ export const postRepository = {
 
 	getPosts: (store: Store) => store.getState().posts,
 
-	getPostById(store: Store, id: string) {
+	getPostById(store: Store, id: UUID) {
 		const { posts, comments } = store.getState();
 
 		const post = posts.find(post => post.id === id);
@@ -48,7 +49,7 @@ export const postRepository = {
 		return isUpdated;
 	},
 
-	deletePost(store: Store, id: string) {
+	deletePost(store: Store, id: UUID) {
 		let isDeleted = false;
 
 		store.setState(state => ({

@@ -1,5 +1,5 @@
 import { type ServerRoute } from '@hapi/hapi';
-import { postController } from 'src/controllers/post.controller';
+import { postController } from 'src/controllers';
 import { failAction } from 'src/utils/fail-action-response';
 import {
 	createPostValidator,
@@ -34,7 +34,7 @@ export const postRoutes: ServerRoute[] = [
 				payload: createPostValidator,
 			},
 		},
-		handler: postController.createPost,
+		handler: postController.addPost,
 	},
 	{
 		path: '/posts/{id}',

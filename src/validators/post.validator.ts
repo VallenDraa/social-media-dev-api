@@ -44,10 +44,6 @@ export const editPostValidator = Joi.object<PostEdit, true>({
 		.uuid()
 		.required()
 		.messages({ 'any.required': 'Owner is invalid or missing' }),
-	createdAt: Joi.string()
-		.isoDate()
-		.required()
-		.messages({ 'any.required': 'Owner is invalid or missing' }),
 });
 
 export const postValidator = createPostValidator.append<Post>({

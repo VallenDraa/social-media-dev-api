@@ -16,4 +16,4 @@ export type PostDetail = Post & {
 };
 
 export type PostCreate = Omit<Post, 'id' | 'createdAt' | 'updatedAt'>;
-export type PostEdit = Omit<Post, 'id' | 'updatedAt'>;
+export type PostEdit = Omit<Post, 'id' | 'createdAt' | 'updatedAt'>;

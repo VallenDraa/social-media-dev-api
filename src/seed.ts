@@ -14,9 +14,13 @@ import { faker } from '@faker-js/faker';
 
 export const seedStore = (store: Store) => {
 	store.setState(state => {
-		const users = [...new Array<User>(100)].map(() => createFakeUser());
+		const users = [
+			...new Array<User>(parseInt(process.env.FAKE_USERS_AMOUNT ?? '100', 10)),
+		].map(() => createFakeUser());
 
-		const posts = [...new Array<Post>(200)].map(() =>
+		const posts = [
+			...new Array<Post>(parseInt(process.env.FAKE_POSTS_AMOUNT ?? '200', 10)),
+		].map(() =>
 			createFakePost({
 				ownerId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
 				dislikes: getRandomsFromArray(users.map(user => user.id)),
@@ -24,7 +28,11 @@ export const seedStore = (store: Store) => {
 			}),
 		);
 
-		const comments = [...new Array<Comment>(400)].map(() => {
+		const comments = [
+			...new Array<Comment>(
+				parseInt(process.env.FAKE_COMMENTS_AMOUNT ?? '400', 10),
+			),
+		].map(() => {
 			const replies = [
 				...new Array<UUID>(faker.number.int({ min: 1, max: 5 })),
 			].map(
