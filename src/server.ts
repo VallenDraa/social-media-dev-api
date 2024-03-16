@@ -1,6 +1,6 @@
 import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
-import { postRoutes } from './routes';
+import { postRoutes, userRoutes } from './routes';
 import { seedStore } from './seed';
 import { store } from './store';
 
@@ -19,7 +19,7 @@ const boostrap = async () => {
 		host: process.env.HOST,
 	});
 
-	server.route([...postRoutes]);
+	server.route([...postRoutes, ...userRoutes]);
 
 	await server.start();
 	console.log(`Server running on ${server.info.uri}`);
