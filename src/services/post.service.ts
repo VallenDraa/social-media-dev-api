@@ -37,6 +37,7 @@ export const postService = {
 		const updatedPost: Post = {
 			id,
 			...updatedPostData,
+			updatedAt: new Date().toISOString(),
 		};
 
 		const isUpdated = postRepository.updatePost(store, updatedPost);
