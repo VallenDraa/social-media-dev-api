@@ -5,5 +5,5 @@ export const idValidator = Joi.object({
 	id: Joi.string()
 		.uuid()
 		.required()
-		.messages({ 'any.required': 'Invalid UUID format' }),
+		.messages({ 'any.required': 'UUID is invalid or missing' }),
 });

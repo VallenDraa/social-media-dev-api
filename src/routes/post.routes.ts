@@ -3,6 +3,7 @@ import { postController } from 'src/controllers/post.controller';
 import { failAction } from 'src/utils/fail-action-response';
 import {
 	createPostValidator,
+	editPostValidator,
 	idValidator,
 	paginateValidator,
 } from 'src/validators';
@@ -42,7 +43,7 @@ export const postRoutes: ServerRoute[] = [
 			validate: {
 				failAction,
 				params: idValidator,
-				payload: createPostValidator,
+				payload: editPostValidator,
 			},
 		},
 		handler: postController.updatePost,

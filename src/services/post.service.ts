@@ -1,15 +1,19 @@
 import { type UUID } from 'crypto';
-import { type Post, type PostCreate } from '../models';
-import { postRepository } from '../repositories';
-import { store } from '../store';
+import { type PostEdit, type Post, type PostCreate } from 'src/models';
+import { postRepository } from 'src/repositories';
+import { store } from 'src/store';
 import Boom from '@hapi/boom';
 import { paginateService } from './pagination.service';
 
 export const postService = {
 	createPost(newPostData: PostCreate) {
+		const createdAt = new Date().toISOString();
+
 		const newPost: Post = {
 			id: crypto.randomUUID(),
 			...newPostData,
+			createdAt,
+			updatedAt: createdAt,
 		};
 
 		postRepository.addPost(store, newPost);
@@ -33,7 +37,7 @@ export const postService = {
 		return post;
 	},
 
-	updatePost(id: UUID, updatedPostData: PostCreate) {
+	updatePost(id: UUID, updatedPostData: PostEdit) {
 		const updatedPost: Post = {
 			id,
 			...updatedPostData,

@@ -1,4 +1,4 @@
-import { type User, type Comment, type Post } from '../models';
+import { type User, type Comment, type Post } from 'src/models';
 import { type UUID } from 'crypto';
 import { faker } from '@faker-js/faker';
 

@@ -1,4 +1,4 @@
-import { type MetaData } from '../models';
+import { type MetaData } from 'src/models';
 
 export const paginateService = {
 	paginate<T>(

@@ -1,6 +1,11 @@
 import { type Request, type ResponseToolkit } from '@hapi/hapi';
-import { type PostDetail, type Post, type PostCreate } from '../models';
-import { postService } from '../services';
+import {
+	type PostDetail,
+	type Post,
+	type PostCreate,
+	type PostEdit,
+} from 'src/models';
+import { postService } from 'src/services';
 import { type MetaData, type ApiResponse } from 'src/models/response.model';
 import { type UUID } from 'crypto';
 
@@ -48,7 +53,7 @@ export const postController = {
 	updatePost(req: Request, h: ResponseToolkit) {
 		const params = req.params as { id: UUID };
 
-		const post = postService.updatePost(params.id, req.payload as PostCreate);
+		const post = postService.updatePost(params.id, req.payload as PostEdit);
 
 		const response: ApiResponse<{ post: Post }> = {
 			statusCode: 200,

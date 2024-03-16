@@ -15,4 +15,5 @@ export type PostDetail = Post & {
 	comments: UUID[];
 };
 
-export type PostCreate = Omit<Post, 'id'>;
+export type PostCreate = Omit<Post, 'id' | 'createdAt' | 'updatedAt'>;
+export type PostEdit = Omit<Post, 'id' | 'updatedAt'>;
