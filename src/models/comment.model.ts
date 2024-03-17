@@ -7,7 +7,13 @@ export type Comment = {
 	owner: UUID;
 	likes: UUID[];
 	dislikes: UUID[];
-	replies: string[];
+	replies: UUID[];
 	createdAt: string;
 	updatedAt: string;
 };
+
+export type CommentCreate = Omit<Comment, 'id' | 'createdAt' | 'updatedAt'>;
+export type CommentEdit = Omit<
+	Comment,
+	'id' | 'owner' | 'post' | 'createdAt' | 'updatedAt'
+>;

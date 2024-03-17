@@ -9,7 +9,7 @@ module.exports = {
 			env: {
 				node: true,
 			},
-			files: ['.eslintrc.{js,cjs}', './src/server.d.ts'],
+			files: ['.eslintrc.{js,cjs}'],
 			parserOptions: {
 				sourceType: 'script',
 			},
@@ -23,6 +23,6 @@ module.exports = {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
 	},
-	ignorePatterns: ['dist', 'node_modules', 'src/server.d.ts'],
+	ignorePatterns: ['dist', 'node_modules'],
 	rules: {},
 };

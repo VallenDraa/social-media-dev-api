@@ -1,25 +1,25 @@
 import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
-import { postRoutes, userRoutes } from './routes';
+import { commentRoutes, postRoutes, userRoutes } from './routes';
 import { seedStore } from './seed';
 import { store } from './store';
 
 const boostrap = async () => {
 	dotenv.config();
 
-	// Setup the store and reset it every 10 minutes
-	const tenMinutes = 600_000;
+	// Setup the store and reset it every 5 minutes
+	const fiveMinutes = 300_000;
 	seedStore(store);
 	setInterval(() => {
 		seedStore(store);
-	}, tenMinutes);
+	}, fiveMinutes);
 
 	const server = Hapi.server({
 		port: process.env.PORT,
 		host: process.env.HOST,
 	});
 
-	server.route([...postRoutes, ...userRoutes]);
+	server.route([...userRoutes, ...postRoutes, ...commentRoutes]);
 
 	await server.start();
 	console.log(`Server running on ${server.info.uri}`);
