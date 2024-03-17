@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
-declare global {
-	namespace NodeJS {
-		export interface ProcessEnv {
-			PORT: string;
-			HOST: string;
-		}
+declare namespace NodeJS {
+	export interface ProcessEnv {
+		PORT: string;
+		HOST: string;
+		FAKE_USER_AMOUNT: string;
+		FAKE_POST_AMOUNT: string;
+		FAKE_COMMENT_AMOUNT: string;
 	}
 }

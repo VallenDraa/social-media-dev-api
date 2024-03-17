@@ -1,28 +1,22 @@
 /** @type {import("eslint").Linter.Config} */
 module.exports = {
 	env: {
-		browser: true,
 		es2021: true,
+		jest: true,
+		node: true,
 	},
-	overrides: [
-		{
-			env: {
-				node: true,
-			},
-			files: ['.eslintrc.{js,cjs}'],
-			parserOptions: {
-				sourceType: 'script',
-			},
-		},
-		{
-			extends: ['xo', 'xo-typescript', 'prettier'],
-			files: ['*.ts', '*.tsx'],
-		},
-	],
+	extends: ['xo', 'xo-typescript', 'prettier'],
+	ignorePatterns: ['dist', 'node_modules'],
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
 	},
-	ignorePatterns: ['dist', 'node_modules'],
-	rules: {},
+	overrides: [
+		{
+			files: ['src/**/*.ts', '.eslintrc.cjs', 'jest.config.js'],
+			rules: {
+				'@typescript-eslint/naming-convention': 'off',
+			},
+		},
+	],
 };
