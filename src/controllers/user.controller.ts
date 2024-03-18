@@ -15,7 +15,7 @@ export const userController = {
 	addUser(req: Request, h: ResponseToolkit) {
 		const user = userService.addUser(req.payload as UserCreate);
 
-		const response: ApiResponse<{ user: User }> = {
+		const response: ApiResponse<{ user: UserWithoutPassword }> = {
 			statusCode: 201,
 			message: 'User created successfully',
 			data: { user },

@@ -4,6 +4,7 @@ import { commentRoutes, postRoutes, userRoutes } from './routes';
 import { seedStoreInit } from './utils/seed-store';
 import { authPlugin } from './plugins/auth.plugin';
 import { store } from './store';
+import { authRoutes } from './routes/auth.routes';
 import { loggerPlugin } from './plugins/logger.plugin';
 
 const boostrap = async () => {
@@ -24,7 +25,7 @@ const boostrap = async () => {
 		},
 	});
 
-	server.route([...userRoutes, ...postRoutes, ...commentRoutes]);
+	server.route([...userRoutes, ...postRoutes, ...commentRoutes, ...authRoutes]);
 
 	await loggerPlugin(server);
 	await authPlugin(server, store);

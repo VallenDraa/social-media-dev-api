@@ -11,7 +11,7 @@ import { type UUID } from 'crypto';
 import { paginateService } from './pagination.service';
 
 export const userService = {
-	addUser(newUserData: UserCreate) {
+	addUser(newUserData: UserCreate): UserWithoutPassword {
 		const createdAt = new Date().toISOString();
 
 		const newUser: User = {
@@ -27,7 +27,9 @@ export const userService = {
 			throw Boom.conflict('The username of email of this user already exists!');
 		}
 
-		return newUser;
+		const { password, ...userWithoutPassword } = newUser;
+
+		return userWithoutPassword;
 	},
 
 	getUsers(limit = 10, page = 1) {
