@@ -11,6 +11,24 @@ import { faker } from '@faker-js/faker';
 const randInt = (min: number, max: number) => faker.number.int({ min, max });
 const emptyArray = <T>(length: number) => [...new Array<T>(length)];
 
+const getRandomRepliesAmount = (
+	fakeCommentRepliesLength: number,
+	chosenRepliesIdx: number[],
+) => {
+	if (
+		fakeCommentRepliesLength - 1 === 0 ||
+		chosenRepliesIdx.length === fakeCommentRepliesLength
+	) {
+		return 0;
+	}
+
+	if (fakeCommentRepliesLength === 1) {
+		return 1;
+	}
+
+	return randInt(1, fakeCommentRepliesLength);
+};
+
 export const seedStore = (
 	store: Store,
 	userAmount = 100,
@@ -44,18 +62,10 @@ export const seedStore = (
 			);
 
 			const chosenRepliesIdx: number[] = [];
-			let repliesAmount: number;
-
-			if (
-				fakeCommentReplies.length - 1 === 0 ||
-				chosenRepliesIdx.length === fakeCommentReplies.length
-			) {
-				repliesAmount = 0;
-			} else if (fakeCommentReplies.length === 1) {
-				repliesAmount = 1;
-			} else {
-				repliesAmount = randInt(1, fakeCommentReplies.length);
-			}
+			const repliesAmount = getRandomRepliesAmount(
+				fakeCommentReplies.length,
+				chosenRepliesIdx,
+			);
 
 			const fakeComment = createFakeComment({
 				ownerId: getRandomFromArray(users).id,

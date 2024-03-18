@@ -2,6 +2,9 @@ import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
 import { commentRoutes, postRoutes, userRoutes } from './routes';
 import { seedStoreInit } from './utils/seed-store';
+import { authPlugin } from './plugins/auth.plugin';
+import { store } from './store';
+import { loggerPlugin } from './plugins/logger.plugin';
 
 const boostrap = async () => {
 	dotenv.config();
@@ -14,12 +17,20 @@ const boostrap = async () => {
 	const server = Hapi.server({
 		port: process.env.PORT,
 		host: process.env.HOST,
+		routes: {
+			cors: {
+				origin: ['*'],
+			},
+		},
 	});
 
 	server.route([...userRoutes, ...postRoutes, ...commentRoutes]);
 
+	await loggerPlugin(server);
+	await authPlugin(server, store);
 	await server.start();
-	console.log(`Server running on ${server.info.uri}`);
+
+	server.logger.info(`Server running on ${server.info.uri}`);
 };
 
 boostrap().catch(err => {
