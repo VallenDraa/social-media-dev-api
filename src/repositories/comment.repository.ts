@@ -1,4 +1,3 @@
-import Boom from '@hapi/boom';
 import { type UUID } from 'crypto';
 import { type Comment } from 'src/models';
 import { type Store } from 'src/store';
@@ -18,7 +17,7 @@ export const commentRepository = {
 		const post = posts.find(post => post.id === postId);
 
 		if (!post) {
-			throw Boom.notFound('Post not found');
+			return null;
 		}
 
 		return comments.filter(comment => comment.post === postId);

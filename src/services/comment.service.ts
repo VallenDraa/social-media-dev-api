@@ -24,6 +24,10 @@ export const commentService = {
 	getCommentsOfPost(postId: UUID, limit = 10, page = 1) {
 		const allComments = commentRepository.getCommentsOfPost(store, postId);
 
+		if (!allComments) {
+			throw Boom.notFound('This post is not found!');
+		}
+
 		return paginateService.paginate(allComments, limit, page);
 	},
 
