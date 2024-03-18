@@ -4,12 +4,12 @@
 	"description": "",
 	"main": "server.js",
 	"scripts": {
-		"dev": "nodemon",
-		"build": "etsc  --config=etsc.config.js",
+		"dev": "nodemon | pino-pretty",
+		"build": "etsc --config=etsc.config.js",
 		"start": "node ./dist/src/server.js",
 		"test": "jest",
 		"test:watch": "jest --watch",
-		"test:coverage": "jest coverage",
+		"test:coverage": "jest --coverage",
 		"lint": "eslint ."
 	},
 	"keywords": [],
@@ -17,6 +17,7 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@types/jest": "^29.5.12",
+		"@types/jsonwebtoken": "^9.0.6",
 		"@typescript-eslint/eslint-plugin": ">=7.0.2",
 		"@typescript-eslint/parser": ">=7.0.2",
 		"esbuild": "^0.20.2",
@@ -27,6 +28,7 @@
 		"eslint-config-xo-typescript": "^4.0.0",
 		"jest": "^29.7.0",
 		"nodemon": "^3.1.0",
+		"pino-pretty": "^10.3.1",
 		"rimraf": "^5.0.5",
 		"supertest": "^6.3.4",
 		"ts-jest": "^29.1.2",
@@ -38,6 +40,9 @@
 		"@hapi/boom": "^10.0.1",
 		"@hapi/hapi": "^21.3.6",
 		"dotenv": "^16.4.5",
-		"joi": "^17.12.2"
+		"hapi-auth-jwt2": "^10.5.1",
+		"hapi-pino": "^12.1.0",
+		"joi": "^17.12.2",
+		"jsonwebtoken": "^9.0.2"
 	}
 }

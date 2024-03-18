@@ -6,7 +6,7 @@ module.exports = {
 		node: true,
 	},
 	extends: ['xo', 'xo-typescript', 'prettier'],
-	ignorePatterns: ['dist', 'node_modules'],
+	ignorePatterns: ['dist', 'coverage', 'node_modules'],
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',
@@ -15,6 +15,7 @@ module.exports = {
 		{
 			files: ['src/**/*.ts', '.eslintrc.cjs', 'jest.config.js'],
 			rules: {
+				'@typescript-eslint/ban-types': 'off',
 				'@typescript-eslint/naming-convention': 'off',
 			},
 		},
