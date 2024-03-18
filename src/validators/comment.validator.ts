@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import Joi from 'joi';
 import { type CommentEdit, type Comment, type CommentCreate } from 'src/models';
 
