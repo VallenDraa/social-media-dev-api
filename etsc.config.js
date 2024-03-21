@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const rimraf = require('rimraf');
 
 module.exports = {
@@ -16,6 +18,6 @@ module.exports = {
 	},
 	// Prebuild hook
 	prebuild() {
-		rimraf.sync('./dist'); // clean up dist folder
+		rimraf.sync('./dist'); // Clean up dist folder
 	},
 };

@@ -1,24 +1,19 @@
 import { dataStore } from 'src/store';
-import { seedStoreInit } from 'src/utils/seed-store';
+import { storeTestSetup, storeTestTeardown } from '../../helper';
 
 describe('seedStore', () => {
-	const OLD_ENV = process.env;
+	let OLD_ENV: NodeJS.ProcessEnv;
 
 	beforeAll(() => {
-		jest.resetModules();
-		process.env = {
-			...OLD_ENV,
-			FAKE_COMMENT_AMOUNT: '10',
-			FAKE_POST_AMOUNT: '10',
-			FAKE_USER_AMOUNT: '10',
-		};
-
-		dataStore.resetStore();
-		seedStoreInit();
+		OLD_ENV = storeTestSetup({
+			fakeCommentAmount: '10',
+			fakePostAmount: '10',
+			fakeUserAmount: '10',
+		});
 	});
 
 	afterAll(() => {
-		process.env = OLD_ENV;
+		storeTestTeardown(OLD_ENV);
 	});
 
 	it('Should have 10 users and posts', () => {

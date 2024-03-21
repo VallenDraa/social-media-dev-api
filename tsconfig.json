@@ -26,6 +26,7 @@
 		"src/__tests__/**/*",
 		"process-env.d.ts",
 		".eslintrc.cjs",
+		"etsc.config.js",
 		"jest.config.js"
 	],
 	"exclude": ["node_modules"]

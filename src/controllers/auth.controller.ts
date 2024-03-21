@@ -10,10 +10,10 @@ import {
 import { authService } from 'src/services/auth.service';
 
 export const authController = {
-	async login(request: Request, h: ResponseToolkit) {
+	login(request: Request, h: ResponseToolkit) {
 		const loginData = request.payload as Login;
 
-		const { accessToken, refreshToken } = await authService.login(loginData);
+		const { accessToken, refreshToken } = authService.login(loginData);
 		const response: ApiResponse<{ accessToken: string; refreshToken: string }> =
 			{
 				statusCode: 200,

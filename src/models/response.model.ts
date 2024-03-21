@@ -4,6 +4,12 @@ export type ApiResponse<T> = {
 	data: T;
 };
 
+export type ErrorApiResponse = {
+	statusCode: number;
+	message: string;
+	error: string;
+};
+
 export type MetaData = {
 	currentPage: number;
 	lastPage: number;
