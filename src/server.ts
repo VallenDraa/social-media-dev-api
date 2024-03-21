@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { commentRoutes, postRoutes, userRoutes } from './routes';
 import { seedStoreInit } from './utils/seed-store';
 import { authPlugin } from './plugins/auth.plugin';
-import { store } from './store';
+import { dataStore } from './store';
 import { authRoutes } from './routes/auth.routes';
 import { loggerPlugin } from './plugins/logger.plugin';
 
@@ -28,9 +28,11 @@ const boostrap = async () => {
 	server.route([...userRoutes, ...postRoutes, ...commentRoutes, ...authRoutes]);
 
 	await loggerPlugin(server);
-	await authPlugin(server, store);
+	await authPlugin(server, dataStore);
 	await server.start();
 
+	const { email, password } = dataStore.state.users[0];
+	server.logger.info(JSON.stringify({ email, password }));
 	server.logger.info(`Server running on ${server.info.uri}`);
 };
 

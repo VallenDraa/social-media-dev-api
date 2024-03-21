@@ -1,16 +1,16 @@
 import { type UUID } from 'crypto';
 import { type Comment } from 'src/models';
-import { type Store } from 'src/store';
+import { type DataStore } from 'src/store';
 
 export const commentRepository = {
-	addComment(store: Store, comment: Comment) {
+	addComment(store: DataStore, comment: Comment) {
 		store.setState(state => ({
 			...state,
 			comments: [comment, ...state.comments],
 		}));
 	},
 
-	getCommentsOfPost(store: Store, postId: UUID) {
+	getCommentsOfPost(store: DataStore, postId: UUID) {
 		const { posts } = store.getState();
 		const { comments } = store.getState();
 
@@ -23,7 +23,7 @@ export const commentRepository = {
 		return comments.filter(comment => comment.post === postId);
 	},
 
-	getCommentById(store: Store, id: UUID) {
+	getCommentById(store: DataStore, id: UUID) {
 		const { comments } = store.getState();
 
 		const comment = comments.find(comment => comment.id === id);
@@ -31,7 +31,7 @@ export const commentRepository = {
 		return comment ?? null;
 	},
 
-	updateComment(store: Store, updatedComment: Comment) {
+	updateComment(store: DataStore, updatedComment: Comment) {
 		let isUpdated = false;
 
 		store.setState(state => ({
@@ -49,7 +49,7 @@ export const commentRepository = {
 		return isUpdated;
 	},
 
-	deleteComment(store: Store, id: UUID) {
+	deleteComment(store: DataStore, id: UUID) {
 		let isDeleted = false;
 
 		store.setState(state => ({

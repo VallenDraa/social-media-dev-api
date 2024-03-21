@@ -6,7 +6,8 @@ declare namespace NodeJS {
 		FAKE_USER_AMOUNT: string;
 		FAKE_POST_AMOUNT: string;
 		FAKE_COMMENT_AMOUNT: string;
-		JWT_SECRET: string;
+		ACCESS_TOKEN_SECRET: string;
+		REFRESH_TOKEN_SECRET: string;
 		NODE_ENV: string;
 	}
 }

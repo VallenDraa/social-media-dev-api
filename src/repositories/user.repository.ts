@@ -1,9 +1,9 @@
 import { type UUID } from 'crypto';
-import { type Store } from 'src/store';
 import { type UserWithoutPassword, type User } from 'src/models';
+import { type DataStore } from 'src/store';
 
 export const userRepository = {
-	addUser(store: Store, user: User) {
+	addUser(store: DataStore, user: User) {
 		let isAdded = false;
 		const { users } = store.getState();
 
@@ -23,14 +23,14 @@ export const userRepository = {
 		return isAdded;
 	},
 
-	getUsers: (store: Store) =>
+	getUsers: (store: DataStore) =>
 		store.getState().users.map(user => {
 			const { password, ...userWithoutPassword } = user;
 
 			return userWithoutPassword as UserWithoutPassword;
 		}),
 
-	getUserById(store: Store, id: UUID) {
+	getUserById(store: DataStore, id: UUID) {
 		const { users } = store.getState();
 
 		const user = users.find(user => user.id === id);
@@ -44,7 +44,7 @@ export const userRepository = {
 		return userWithoutPassword as UserWithoutPassword;
 	},
 
-	getUserWithPassword(store: Store, id: UUID) {
+	getUserWithPassword(store: DataStore, id: UUID) {
 		const { users } = store.getState();
 
 		const user = users.find(user => user.id === id);
@@ -52,7 +52,7 @@ export const userRepository = {
 		return user ?? null;
 	},
 
-	updateUser(store: Store, updatedUser: UserWithoutPassword) {
+	updateUser(store: DataStore, updatedUser: UserWithoutPassword) {
 		let isUpdated = false;
 
 		store.setState(state => ({
@@ -70,7 +70,7 @@ export const userRepository = {
 		return isUpdated;
 	},
 
-	updateUserPassword(store: Store, id: UUID, newPassword: string) {
+	updateUserPassword(store: DataStore, id: UUID, newPassword: string) {
 		let isUpdated = false;
 
 		store.setState(state => ({
@@ -88,7 +88,7 @@ export const userRepository = {
 		return isUpdated;
 	},
 
-	deleteUser(store: Store, id: UUID) {
+	deleteUser(store: DataStore, id: UUID) {
 		let isDeleted = false;
 
 		store.setState(state => ({

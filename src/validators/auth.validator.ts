@@ -1,5 +1,9 @@
 import Joi from 'joi';
-import { type RegisterData, type Login } from 'src/models';
+import {
+	type RegisterData,
+	type Login,
+	type RefreshTokenPayload,
+} from 'src/models';
 
 export const loginValidator = Joi.object<Login, true>({
 	email: Joi.string()
@@ -25,4 +29,10 @@ export const registerValidator = Joi.object<RegisterData, true>({
 	confirmPassword: Joi.string().min(8).required().messages({
 		'any.required': 'Password confirmation is invalid or missing',
 	}),
+});
+
+export const refreshTokenValidator = Joi.object<RefreshTokenPayload, true>({
+	refreshToken: Joi.string()
+		.required()
+		.messages({ 'any.required': 'Refresh	token is invalid or missing' }),
 });

@@ -23,3 +23,7 @@ export type AccessToken = {
 	iat: number;
 	exp: number;
 };
+
+export type RefreshTokenPayload = {
+	refreshToken: string;
+};

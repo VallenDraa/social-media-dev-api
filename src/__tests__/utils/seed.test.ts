@@ -1,4 +1,4 @@
-import { store } from 'src/store';
+import { dataStore } from 'src/store';
 import { seedStoreInit } from 'src/utils/seed-store';
 
 describe('seedStore', () => {
@@ -13,7 +13,7 @@ describe('seedStore', () => {
 			FAKE_USER_AMOUNT: '10',
 		};
 
-		store.resetStore();
+		dataStore.resetStore();
 		seedStoreInit();
 	});
 
@@ -22,14 +22,14 @@ describe('seedStore', () => {
 	});
 
 	it('Should have 10 users and posts', () => {
-		const { posts, users } = store.getState();
+		const { posts, users } = dataStore.getState();
 
 		expect(users.length).toBe(10);
 		expect(posts.length).toBe(10);
 	});
 
 	it("All users 'username' and 'email' should be unique", () => {
-		const { users } = store.getState();
+		const { users } = dataStore.getState();
 
 		const usernames = new Set(users.map(user => user.username));
 		const emails = new Set(users.map(user => user.email));
@@ -39,7 +39,7 @@ describe('seedStore', () => {
 	});
 
 	it('All comments replies should belong to the same posts', () => {
-		const { comments } = store.getState();
+		const { comments } = dataStore.getState();
 
 		for (const comment of comments) {
 			const { replies, post } = comment;
@@ -53,7 +53,7 @@ describe('seedStore', () => {
 	});
 
 	it('All comments replies are unique', () => {
-		const { comments } = store.getState();
+		const { comments } = dataStore.getState();
 
 		for (const comment of comments) {
 			const { replies } = comment;

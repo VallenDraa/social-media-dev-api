@@ -1,6 +1,6 @@
 import { type UUID } from 'crypto';
-import { type User, type Post, type Comment } from '../models';
-import { store, type Store } from '../store';
+import { type Store, type User, type Post, type Comment } from '../models';
+import { type DataStore, dataStore } from '../store';
 import { createFakeComment, createFakeUser, createFakePost } from './fake-data';
 import {
 	getRandomFromArray,
@@ -30,7 +30,7 @@ const getRandomRepliesAmount = (
 };
 
 export const seedStore = (
-	store: Store,
+	store: DataStore,
 	userAmount = 100,
 	postAmount = 200,
 	commentAmount = 400,
@@ -101,7 +101,7 @@ export const seedStoreInit = () => {
 		process.env;
 
 	seedStore(
-		store,
+		dataStore,
 		parseInt(FAKE_USER_AMOUNT ?? '100', 10),
 		parseInt(FAKE_COMMENT_AMOUNT ?? '100', 10),
 		parseInt(FAKE_POST_AMOUNT ?? '100', 10),

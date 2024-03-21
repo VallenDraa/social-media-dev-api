@@ -5,19 +5,21 @@ import {
 	type UserWithoutPassword,
 	type AccessToken,
 	type RegisterData,
+	type RefreshTokenPayload,
 } from 'src/models';
 import { authService } from 'src/services/auth.service';
 
 export const authController = {
-	login(request: Request, h: ResponseToolkit) {
+	async login(request: Request, h: ResponseToolkit) {
 		const loginData = request.payload as Login;
 
-		const token = authService.login(loginData);
-		const response: ApiResponse<{ token: string }> = {
-			statusCode: 200,
-			message: 'Login successful',
-			data: { token },
-		};
+		const { accessToken, refreshToken } = await authService.login(loginData);
+		const response: ApiResponse<{ accessToken: string; refreshToken: string }> =
+			{
+				statusCode: 200,
+				message: 'Login successful',
+				data: { accessToken, refreshToken },
+			};
 
 		return h.response(response);
 	},
@@ -33,6 +35,19 @@ export const authController = {
 		};
 
 		return h.response(response).code(201);
+	},
+
+	refreshToken(request: Request, h: ResponseToolkit) {
+		const { refreshToken } = request.payload as RefreshTokenPayload;
+		const newAccessToken = authService.refreshToken(refreshToken);
+
+		const response: ApiResponse<{ accessToken: string }> = {
+			statusCode: 200,
+			message: 'Successfully refreshed access token',
+			data: { accessToken: newAccessToken },
+		};
+
+		return h.response(response);
 	},
 
 	me(request: Request, h: ResponseToolkit) {

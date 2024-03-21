@@ -1,26 +1,33 @@
-import { store } from 'src/store';
+import { dataStore } from 'src/store';
 import { type UUID } from 'crypto';
 import Boom from '@hapi/boom';
 import { userService } from './user.service';
 import {
 	type RegisterData,
 	type Login,
-	type Register,
+	type AccessToken,
 } from 'src/models/auth.model';
 import { type User } from 'src/models';
 import { authRepository } from 'src/repositories/auth.repository';
-import { createAccessToken } from 'src/utils/jwt';
+import {
+	createAccessToken,
+	createRefreshToken,
+	validateRefreshToken,
+} from 'src/utils/jwt';
+import { TokenExpiredError } from 'jsonwebtoken';
 
 export const authService = {
 	login(loginData: Login) {
-		const user = authRepository.login(store, loginData);
+		const user = authRepository.login(dataStore, loginData);
 
 		if (!user) {
 			throw Boom.unauthorized('Invalid email or password');
 		}
 
-		const token = createAccessToken({ sub: user.id });
-		return token;
+		const accessToken = createAccessToken(user.id, {});
+		const refreshToken = createRefreshToken(user.id, {});
+
+		return { accessToken, refreshToken };
 	},
 
 	register(registerData: RegisterData) {
@@ -41,14 +48,37 @@ export const authService = {
 			updatedAt: createdAt,
 		};
 
-		const isRegistered = authRepository.register(store, newUser);
+		const isRegistered = authRepository.register(dataStore, newUser);
 
 		if (!isRegistered) {
 			throw Boom.badRequest('User already exists');
 		}
 	},
 
+	refreshToken(refreshToken: string) {
+		if (!refreshToken) {
+			throw Boom.badRequest('Refresh token is required');
+		}
+
+		try {
+			const decoded = validateRefreshToken(refreshToken) as AccessToken;
+			const newAccessToken = createAccessToken(decoded.sub, {});
+
+			return newAccessToken;
+		} catch (error) {
+			if (error instanceof TokenExpiredError) {
+				throw Boom.unauthorized('Refresh token expired');
+			}
+
+			throw Boom.unauthorized('Invalid refresh token');
+		}
+	},
+
 	me(id: UUID) {
+		if (!id) {
+			throw Boom.badRequest('User ID is required');
+		}
+
 		const user = userService.getUserById(id);
 
 		if (!user) {

@@ -4,7 +4,7 @@ import {
 	type UserCreate,
 	type UserWithoutPassword,
 } from 'src/models';
-import { store } from 'src/store';
+import { dataStore } from 'src/store';
 import { userRepository } from 'src/repositories';
 import Boom from '@hapi/boom';
 import { type UUID } from 'crypto';
@@ -21,7 +21,7 @@ export const userService = {
 			updatedAt: createdAt,
 		};
 
-		const isAdded = userRepository.addUser(store, newUser);
+		const isAdded = userRepository.addUser(dataStore, newUser);
 
 		if (!isAdded) {
 			throw Boom.conflict('The username of email of this user already exists!');
@@ -33,13 +33,13 @@ export const userService = {
 	},
 
 	getUsers(limit = 10, page = 1) {
-		const users = userRepository.getUsers(store);
+		const users = userRepository.getUsers(dataStore);
 
 		return paginateService.paginate(users, limit, page);
 	},
 
 	getUserById(id: UUID) {
-		const user = userRepository.getUserById(store, id);
+		const user = userRepository.getUserById(dataStore, id);
 
 		if (!user) {
 			throw Boom.notFound('User not found!');
@@ -57,7 +57,7 @@ export const userService = {
 			updatedAt: new Date().toISOString(),
 		};
 
-		const isUpdated = userRepository.updateUser(store, updatedUser);
+		const isUpdated = userRepository.updateUser(dataStore, updatedUser);
 
 		if (!isUpdated) {
 			throw Boom.notFound('User not found!');
@@ -67,7 +67,7 @@ export const userService = {
 	},
 
 	updateUserPassword(id: UUID, oldPassword: string, newPassword: string) {
-		const user = userRepository.getUserWithPassword(store, id);
+		const user = userRepository.getUserWithPassword(dataStore, id);
 
 		if (!user) {
 			throw Boom.notFound('User not found!');
@@ -83,7 +83,11 @@ export const userService = {
 			);
 		}
 
-		const isUpdated = userRepository.updateUserPassword(store, id, newPassword);
+		const isUpdated = userRepository.updateUserPassword(
+			dataStore,
+			id,
+			newPassword,
+		);
 
 		if (!isUpdated) {
 			throw Boom.notFound('User not found!');
@@ -93,7 +97,7 @@ export const userService = {
 	},
 
 	deleteUser(id: UUID) {
-		const isDeleted = userRepository.deleteUser(store, id);
+		const isDeleted = userRepository.deleteUser(dataStore, id);
 
 		if (!isDeleted) {
 			throw Boom.notFound('User not found!');

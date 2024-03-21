@@ -1,10 +1,9 @@
-import { type UserWithoutPassword, type User } from 'src/models';
-import { type Login } from 'src/models/auth.model';
-import { type Store } from 'src/store';
+import { type Login, type UserWithoutPassword, type User } from 'src/models';
 import { type UUID } from 'crypto';
+import { type DataStore } from 'src/store';
 
 export const authRepository = {
-	login(store: Store, loginData: Login) {
+	login(store: DataStore, loginData: Login) {
 		const { users } = store.getState();
 		const user = users.find(user => user.email === loginData.email);
 
@@ -21,7 +20,7 @@ export const authRepository = {
 		return userWithoutPassword as UserWithoutPassword;
 	},
 
-	register(store: Store, user: User) {
+	register(store: DataStore, user: User) {
 		let isRegistered = false;
 		const { users } = store.getState();
 
@@ -41,7 +40,7 @@ export const authRepository = {
 		return isRegistered;
 	},
 
-	me(store: Store, id: UUID) {
+	me(store: DataStore, id: UUID) {
 		const { users } = store.getState();
 		const user = users.find(user => user.id === id);
 
