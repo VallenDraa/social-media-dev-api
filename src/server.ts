@@ -7,13 +7,16 @@ import { dataStore } from './store';
 import { authRoutes } from './routes/auth.routes';
 import { loggerPlugin } from './plugins/logger.plugin';
 
-const boostrap = async () => {
+export const createServer = async (isTest: boolean) => {
 	dotenv.config();
 
 	// Setup the store and reset it every 5 minutes
 	seedStoreInit();
-	const fiveMinutes = 300_000;
-	setInterval(seedStoreInit, fiveMinutes);
+
+	if (!isTest) {
+		const fiveMinutes = 300_000;
+		setInterval(seedStoreInit, fiveMinutes);
+	}
 
 	const server = Hapi.server({
 		port: process.env.PORT,
@@ -27,16 +30,16 @@ const boostrap = async () => {
 
 	server.route([...userRoutes, ...postRoutes, ...commentRoutes, ...authRoutes]);
 
-	await loggerPlugin(server);
+	if (!isTest) {
+		await loggerPlugin(server);
+	}
+
 	await authPlugin(server, dataStore);
 	await server.start();
 
-	const { email, password } = dataStore.state.users[0];
-	server.logger.info(JSON.stringify({ email, password }));
-	server.logger.info(`Server running on ${server.info.uri}`);
-};
+	if (!isTest) {
+		server.logger.info(`Server running on ${server.info.uri}`);
+	}
 
-boostrap().catch(err => {
-	console.error(err);
-	process.exit(1);
-});
+	return server;
+};
