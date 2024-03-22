@@ -8,7 +8,7 @@ import {
 import request from 'supertest';
 import { type Server } from '@hapi/hapi';
 import { createServer } from 'src/server';
-import { DEV_URL, FAKE_USER } from '../helper';
+import { FAKE_USER } from '../helper';
 import jwt from 'jsonwebtoken';
 
 describe('Auth e2e', () => {
@@ -18,13 +18,9 @@ describe('Auth e2e', () => {
 		server = await createServer(true);
 	});
 
-	afterAll(async () => {
-		await server.stop();
-	});
-
 	describe('POST /auth/register', () => {
 		const sendRegisterData = (data: object, status: number) =>
-			request(DEV_URL)
+			request(server.listener)
 				.post('/auth/register')
 				.send(data)
 				.expect(status)
@@ -147,7 +143,7 @@ describe('Auth e2e', () => {
 		};
 
 		const sendLoginData = (data: object, status: number) =>
-			request(DEV_URL)
+			request(server.listener)
 				.post('/auth/login')
 				.send(data)
 				.expect(status)
@@ -202,7 +198,7 @@ describe('Auth e2e', () => {
 
 	describe('GET /auth/me', () => {
 		const sendMeRequest = (status: number, accessToken?: string) => {
-			const req = request(DEV_URL).get('/auth/me');
+			const req = request(server.listener).get('/auth/me');
 
 			if (accessToken) {
 				void req.set('Authorization', `Bearer ${accessToken}`);
@@ -232,7 +228,7 @@ describe('Auth e2e', () => {
 			});
 
 			// Create expired token
-			const expiredToken = await request(DEV_URL)
+			const expiredToken = await request(server.listener)
 				.post('/auth/login')
 				.send({ email: 'fake@gmail.com', password: 'fake1234567' })
 				.then(({ body }) => {
@@ -257,7 +253,7 @@ describe('Auth e2e', () => {
 		});
 
 		it('Should return user details when access token is valid', async () => {
-			const accessToken = await request(DEV_URL)
+			const accessToken = await request(server.listener)
 				.post('/auth/login')
 				.send({ email: 'fake@gmail.com', password: 'fake1234567' })
 				.then(
@@ -288,7 +284,7 @@ describe('Auth e2e', () => {
 
 	describe('POST /auth/refresh-token', () => {
 		const getTokens = async () =>
-			request(DEV_URL)
+			request(server.listener)
 				.post('/auth/login')
 				.send({ email: 'fake@gmail.com', password: 'fake1234567' })
 				.then(response => {
@@ -308,7 +304,7 @@ describe('Auth e2e', () => {
 				{ subject: userId, expiresIn: '0s' },
 			);
 
-			await request(DEV_URL)
+			await request(server.listener)
 				.post('/auth/refresh-token')
 				.send({ refreshToken: expiredRefreshToken })
 				.expect(401)
@@ -326,7 +322,7 @@ describe('Auth e2e', () => {
 				tokens => tokens.refreshToken,
 			);
 
-			await request(DEV_URL)
+			await request(server.listener)
 				.post('/auth/refresh-token')
 				.send({ refreshToken })
 				.expect(200)

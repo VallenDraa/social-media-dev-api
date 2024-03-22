@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { type Server } from '@hapi/hapi';
 import { createServer } from 'src/server';
-import { DEV_URL, FAKE_USER } from '../helper';
+import { FAKE_USER } from '../helper';
 import {
 	type MetaData,
 	type Post,
@@ -30,10 +30,10 @@ describe('Posts e2e', () => {
 		server = await createServer(true);
 
 		// Register fake user
-		await request(DEV_URL).post('/auth/register').send(FAKE_USER);
+		await request(server.listener).post('/auth/register').send(FAKE_USER);
 
 		// Get accesss token of fake user
-		accessToken = await request(DEV_URL)
+		accessToken = await request(server.listener)
 			.post('/auth/login')
 			.send({
 				email: FAKE_USER.email,
@@ -45,18 +45,13 @@ describe('Posts e2e', () => {
 			);
 
 		// Get fake user detail
-		fakeUser = await request(DEV_URL)
+		fakeUser = await request(server.listener)
 			.get('/auth/me')
 			.set('Authorization', `Bearer ${accessToken}`)
 			.then(
 				res =>
 					(res.body as ApiResponse<{ user: UserWithoutPassword }>).data.user,
 			);
-	});
-
-	afterAll(async () => {
-		await server.stop();
-		process.env = OLD_ENV;
 	});
 
 	describe('GET /posts', () => {
@@ -71,7 +66,7 @@ describe('Posts e2e', () => {
 				query.set('limit', limit.toString());
 			}
 
-			return request(DEV_URL)
+			return request(server.listener)
 				.get(`/posts?${query.toString()}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 		};
@@ -144,7 +139,7 @@ describe('Posts e2e', () => {
 
 	describe('POST /posts', () => {
 		const addPost = (newPost: Partial<PostCreate>) =>
-			request(DEV_URL)
+			request(server.listener)
 				.post('/posts')
 				.send(newPost)
 				.set('Authorization', `Bearer ${accessToken}`);
@@ -251,12 +246,12 @@ describe('Posts e2e', () => {
 
 	describe('GET /posts/:id', () => {
 		const getPostById = (id: string) =>
-			request(DEV_URL)
+			request(server.listener)
 				.get(`/posts/${id}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should return post when found', async () => {
-			const validPostId = await request(DEV_URL)
+			const validPostId = await request(server.listener)
 				.get('/posts')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)
@@ -291,13 +286,13 @@ describe('Posts e2e', () => {
 
 	describe('PUT /posts/:id', () => {
 		const updatePost = (postId: string, post: Partial<PostEdit>) =>
-			request(DEV_URL)
+			request(server.listener)
 				.put(`/posts/${postId}`)
 				.send(post)
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		const getValidPost = async () =>
-			request(DEV_URL)
+			request(server.listener)
 				.get('/posts')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)
@@ -439,12 +434,12 @@ describe('Posts e2e', () => {
 
 	describe('DELETE /posts/:id', () => {
 		const deletePostById = (id: string) =>
-			request(DEV_URL)
+			request(server.listener)
 				.delete(`/posts/${id}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should delete post when found', async () => {
-			const validPostId = await request(DEV_URL)
+			const validPostId = await request(server.listener)
 				.get('/posts')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)

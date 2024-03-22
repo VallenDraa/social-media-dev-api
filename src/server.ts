@@ -35,7 +35,6 @@ export const createServer = async (isTest: boolean) => {
 	}
 
 	await authPlugin(server, dataStore);
-	await server.start();
 
 	if (!isTest) {
 		server.logger.info(`Server running on ${server.info.uri}`);
