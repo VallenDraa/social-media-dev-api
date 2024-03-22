@@ -7,8 +7,9 @@
 		"dev": "nodemon | pino-pretty",
 		"build": "etsc --config=etsc.config.js",
 		"start": "node ./dist/src/index.js",
-		"test": "jest",
-		"test:watch": "jest --watch",
+		"test": "jest --watch",
+		"test:unit": "jest --watch --testPathPattern=src/__tests__/unit",
+		"test:e2e": "jest --watch --testPathPattern=src/__tests__/e2e",
 		"test:coverage": "jest --coverage",
 		"lint": "eslint ."
 	},

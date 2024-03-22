@@ -25,7 +25,7 @@ export const createPostValidator = Joi.object<PostCreate, true>({
 
 export const editPostValidator = Joi.object<PostEdit, true>({
 	description: Joi.string().required().messages({
-		'any.required': 'Description is required',
+		'any.required': 'Description is invalid or missing',
 	}),
 	likes: Joi.array()
 		.items(Joi.string().uuid())

@@ -1,9 +1,9 @@
 import { type UUID } from 'crypto';
 import { type PostEdit, type Post, type PostCreate } from 'src/models';
-import { postRepository } from 'src/repositories';
+import { postRepository, userRepository } from 'src/repositories';
 import { dataStore } from 'src/store';
-import Boom from '@hapi/boom';
 import { paginateService } from './pagination.service';
+import Boom from '@hapi/boom';
 
 export const postService = {
 	addPost(newPostData: PostCreate) {
@@ -15,6 +15,12 @@ export const postService = {
 			createdAt,
 			updatedAt: createdAt,
 		};
+
+		const isOwnerExist = userRepository.getUserById(dataStore, newPost.owner);
+
+		if (!isOwnerExist) {
+			throw Boom.notFound('Post owner is not found!');
+		}
 
 		postRepository.addPost(dataStore, newPost);
 
@@ -40,16 +46,38 @@ export const postService = {
 	updatePost(id: UUID, updatedPostData: PostEdit) {
 		const post = this.getPostById(id);
 
+		if (!post) {
+			throw Boom.notFound('This post is not found!');
+		}
+
 		const updatedPost: Post = {
 			...post,
 			...updatedPostData,
 			updatedAt: new Date().toISOString(),
 		};
 
+		// Check if likes user id is valid
+		for (const like of updatedPost.likes) {
+			const isUserExist = userRepository.getUserById(dataStore, like);
+
+			if (!isUserExist) {
+				throw Boom.notFound('Some likes are not valid!');
+			}
+		}
+
+		// Check if dislikes user id is valid
+		for (const dislike of updatedPost.dislikes) {
+			const isUserExist = userRepository.getUserById(dataStore, dislike);
+
+			if (!isUserExist) {
+				throw Boom.notFound('Some dislikes are not valid!');
+			}
+		}
+
 		const isUpdated = postRepository.updatePost(dataStore, updatedPost);
 
 		if (!isUpdated) {
-			throw Boom.notFound('This post is not found!');
+			throw Boom.badImplementation('Fail to update post!');
 		}
 
 		return updatedPost;

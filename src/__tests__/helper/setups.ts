@@ -1,6 +1,4 @@
-import { type User } from 'src/models';
 import { dataStore } from 'src/store';
-import { createAccessToken } from 'src/utils/jwt';
 import { seedStoreInit } from 'src/utils/seed-store';
 
 export const storeTestSetup = ({

@@ -1,14 +1,14 @@
 import {
 	type ErrorApiResponse,
 	type ApiResponse,
-	type RegisterData,
 	type Login,
 	type UserWithoutPassword,
+	type RegisterData,
 } from 'src/models';
 import request from 'supertest';
 import { type Server } from '@hapi/hapi';
 import { createServer } from 'src/server';
-import { DEV_URL } from '../helper';
+import { DEV_URL, FAKE_USER } from '../helper';
 import jwt from 'jsonwebtoken';
 
 describe('Auth e2e', () => {
@@ -22,18 +22,7 @@ describe('Auth e2e', () => {
 		await server.stop();
 	});
 
-	afterEach(() => {
-		jest.clearAllMocks();
-	});
-
 	describe('POST /auth/register', () => {
-		const registerData: RegisterData = {
-			email: 'fake@gmail.com',
-			username: 'fake',
-			confirmPassword: 'fake1234567',
-			password: 'fake1234567',
-		};
-
 		const sendRegisterData = (data: object, status: number) =>
 			request(DEV_URL)
 				.post('/auth/register')
@@ -42,7 +31,7 @@ describe('Auth e2e', () => {
 				.expect('Content-Type', /json/);
 
 		it('Should register new user and return 201 status code', async () => {
-			await sendRegisterData(registerData, 201).then(response => {
+			await sendRegisterData(FAKE_USER, 201).then(response => {
 				const body = response.body as ApiResponse<null>;
 				expect(body.data).toBeNull();
 				expect(body.message).toStrictEqual('Registration successful');
@@ -51,7 +40,7 @@ describe('Auth e2e', () => {
 		});
 
 		it('Should return 400 status code when there is a duplicate user in the database', async () => {
-			await sendRegisterData(registerData, 400)
+			await sendRegisterData(FAKE_USER, 400)
 				.expect('Content-Type', /json/)
 				.then(response => {
 					const body = response.body as ErrorApiResponse;
