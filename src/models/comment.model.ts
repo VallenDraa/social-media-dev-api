@@ -12,7 +12,10 @@ export type Comment = {
 	updatedAt: string;
 };
 
-export type CommentCreate = Omit<Comment, 'id' | 'createdAt' | 'updatedAt'>;
+export type CommentCreate = Omit<
+	Comment,
+	'id' | 'post' | 'createdAt' | 'updatedAt'
+>;
 export type CommentEdit = Omit<
 	Comment,
 	'id' | 'owner' | 'post' | 'createdAt' | 'updatedAt'

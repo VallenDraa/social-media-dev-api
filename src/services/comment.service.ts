@@ -1,17 +1,27 @@
 import { type UUID } from 'crypto';
 import { type CommentEdit, type CommentCreate, type Comment } from 'src/models';
-import { commentRepository } from 'src/repositories';
+import {
+	commentRepository,
+	postRepository,
+	userRepository,
+} from 'src/repositories';
 import { dataStore } from 'src/store';
 import Boom from '@hapi/boom';
 import { paginateService } from './pagination.service';
 
 export const commentService = {
-	addComment(newCommentData: CommentCreate) {
-		const createdAt = new Date().toISOString();
+	addComment(postId: UUID, newCommentData: CommentCreate) {
+		const post = postRepository.getPostById(dataStore, postId);
 
+		if (!post) {
+			throw Boom.notFound('The post for this comment is missing!');
+		}
+
+		const createdAt = new Date().toISOString();
 		const newComment: Comment = {
 			id: crypto.randomUUID(),
 			...newCommentData,
+			post: postId,
 			createdAt,
 			updatedAt: createdAt,
 		};
@@ -49,6 +59,24 @@ export const commentService = {
 			...updatedCommentData,
 			updatedAt: new Date().toISOString(),
 		};
+
+		// Check if likes user id is valid
+		for (const like of updatedComment.likes) {
+			const isUserExist = userRepository.getUserById(dataStore, like);
+
+			if (!isUserExist) {
+				throw Boom.notFound('Some likes are not valid!');
+			}
+		}
+
+		// Check if dislikes user id is valid
+		for (const dislike of updatedComment.dislikes) {
+			const isUserExist = userRepository.getUserById(dataStore, dislike);
+
+			if (!isUserExist) {
+				throw Boom.notFound('Some dislikes are not valid!');
+			}
+		}
 
 		const isUpdated = commentRepository.updateComment(
 			dataStore,

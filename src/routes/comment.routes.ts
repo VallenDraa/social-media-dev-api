@@ -1,7 +1,11 @@
 import { type ServerRoute } from '@hapi/hapi';
 import { commentController } from 'src/controllers';
 import { failAction } from 'src/utils/fail-action-response';
-import { idValidator, postIdValidator } from 'src/validators';
+import {
+	idValidator,
+	paginateValidator,
+	postIdValidator,
+} from 'src/validators';
 import { createCommentValidator, editCommentValidator } from 'src/validators/';
 
 export const commentRoutes: ServerRoute[] = [
@@ -12,6 +16,7 @@ export const commentRoutes: ServerRoute[] = [
 			validate: {
 				failAction,
 				params: postIdValidator,
+				query: paginateValidator,
 			},
 		},
 		handler: commentController.getCommentsOfPost,
@@ -19,14 +24,21 @@ export const commentRoutes: ServerRoute[] = [
 	{
 		path: '/comments/{id}',
 		method: 'GET',
+		options: {
+			validate: {
+				failAction,
+				params: idValidator,
+			},
+		},
 		handler: commentController.getCommentById,
 	},
 	{
-		path: '/comments',
+		path: '/posts/{postId}/comments',
 		method: 'POST',
 		options: {
 			validate: {
 				failAction,
+				params: postIdValidator,
 				payload: createCommentValidator,
 			},
 		},

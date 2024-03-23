@@ -5,11 +5,6 @@ export const createCommentValidator = Joi.object<CommentCreate, true>({
 	content: Joi.string().trim().required().messages({
 		'any.required': 'Content is invalid or missing',
 	}),
-	post: Joi.string()
-		.trim()
-		.uuid()
-		.required()
-		.messages({ 'any.required': 'Post UUID is invalid or missing' }),
 	owner: Joi.string()
 		.trim()
 		.uuid()

@@ -6,7 +6,10 @@ import { commentService } from 'src/services';
 
 export const commentController = {
 	addComment(req: Request, h: ResponseToolkit) {
-		const comment = commentService.addComment(req.payload as CommentCreate);
+		const { postId } = req.params as { postId: UUID };
+		const payload = req.payload as CommentCreate;
+
+		const comment = commentService.addComment(postId, payload);
 
 		const response: ApiResponse<{ comment: Comment }> = {
 			statusCode: 201,
