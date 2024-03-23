@@ -10,6 +10,7 @@ import {
 	type PostCreate,
 	type UserWithoutPassword,
 	type PostEdit,
+	type PostDetail,
 } from 'src/models';
 import { registerDataMock } from 'src/__tests__/mocks';
 
@@ -57,7 +58,17 @@ describe('Posts e2e', () => {
 	});
 
 	describe('GET /posts', () => {
-		const getPosts = (page?: number | string, limit?: number | string) => {
+		const getPosts = ({
+			page,
+			limit,
+			hasComments = false,
+			withTopComments = false,
+		}: {
+			page?: number | string;
+			limit?: number | string;
+			hasComments?: boolean;
+			withTopComments?: boolean;
+		}) => {
 			const query = new URLSearchParams();
 
 			if (page) {
@@ -68,13 +79,21 @@ describe('Posts e2e', () => {
 				query.set('limit', limit.toString());
 			}
 
+			if (hasComments) {
+				query.set('has-comments', 'true');
+			}
+
+			if (withTopComments) {
+				query.set('with-top-comments', 'true');
+			}
+
 			return request(server.listener)
 				.get(`/posts?${query.toString()}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 		};
 
 		it('Should return first page with 10 posts when no query is not provided', async () => {
-			await getPosts()
+			await getPosts({})
 				.expect(200)
 				.then(res => {
 					const body = res.body as ApiResponse<{
@@ -88,7 +107,7 @@ describe('Posts e2e', () => {
 		});
 
 		it('Should return second page with 5 posts per page', async () => {
-			await getPosts(2, 5)
+			await getPosts({ page: 2, limit: 5 })
 				.expect(200)
 				.then(res => {
 					const body = res.body as ApiResponse<{
@@ -102,7 +121,7 @@ describe('Posts e2e', () => {
 		});
 
 		it('Should return empty array when page query is more than the total pages', async () => {
-			await getPosts(10)
+			await getPosts({ page: 10 })
 				.expect(200)
 				.then(res => {
 					const body = res.body as ApiResponse<{
@@ -118,7 +137,7 @@ describe('Posts e2e', () => {
 
 		it('Should return 400 when page or limit query is not a number', async () => {
 			// Invalid page
-			await getPosts('a')
+			await getPosts({ page: 'a' })
 				.expect(400)
 				.then(res => {
 					const body = res.body as ErrorApiResponse;
@@ -128,7 +147,7 @@ describe('Posts e2e', () => {
 				});
 
 			// Invalid limit
-			await getPosts(1, 'b')
+			await getPosts({ limit: 'b' })
 				.expect(400)
 				.then(res => {
 					const body = res.body as ErrorApiResponse;
@@ -138,9 +157,63 @@ describe('Posts e2e', () => {
 				});
 		});
 
-		it.todo(
-			"Should return post with top comments when 'with-top-comments' query is provided",
-		);
+		it("Should only return posts with comments when 'has-comments' query is true", async () => {
+			const allPostsAmount = await getPosts({})
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{
+						posts: PostDetail[];
+						metadata: MetaData;
+					}>;
+
+					return body.data.metadata.total;
+				});
+
+			const postsWithCommentsAmount = await getPosts({ hasComments: true })
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{
+						posts: PostDetail[];
+						metadata: MetaData;
+					}>;
+
+					return body.data.metadata.total;
+				});
+
+			expect(postsWithCommentsAmount).toBeLessThan(allPostsAmount);
+		});
+
+		it("Should return posts with comments property when 'with-top-comments' query is true", async () => {
+			await getPosts({ withTopComments: true })
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{
+						posts: PostDetail[];
+						metadata: MetaData;
+					}>;
+
+					for (const post of body.data.posts) {
+						expect(post).toHaveProperty('comments');
+					}
+				});
+		});
+
+		it('Should only return posts with comments and post should return with the comments field', async () => {
+			await getPosts({
+				hasComments: true,
+				withTopComments: true,
+			}).then(res => {
+				const body = res.body as ApiResponse<{
+					posts: PostDetail[];
+					metadata: MetaData;
+				}>;
+
+				for (const post of body.data.posts) {
+					expect(post).toHaveProperty('comments');
+					expect(post.comments).not.toHaveLength(0);
+				}
+			});
+		});
 	});
 
 	describe('POST /posts', () => {
