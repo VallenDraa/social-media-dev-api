@@ -5,7 +5,7 @@ import {
 	createPostValidator,
 	editPostValidator,
 	idValidator,
-	paginateValidator,
+	searchPostValidator,
 } from 'src/validators';
 
 export const postRoutes: ServerRoute[] = [
@@ -15,7 +15,7 @@ export const postRoutes: ServerRoute[] = [
 		options: {
 			validate: {
 				failAction,
-				query: paginateValidator,
+				query: searchPostValidator,
 			},
 		},
 		handler: postController.getPosts,

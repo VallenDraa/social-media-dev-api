@@ -23,9 +23,19 @@ export const postController = {
 	},
 
 	getPosts(req: Request, h: ResponseToolkit) {
-		const query = req.query as { page: number; limit: number };
+		const query = req.query as {
+			page: number;
+			limit: number;
+			'with-top-comments': boolean;
+			'has-comments': boolean;
+		};
 
-		const { data, metadata } = postService.getPosts(query.limit, query.page);
+		const { data, metadata } = postService.getPosts({
+			limit: query.limit,
+			page: query.page,
+			withTopComments: query['with-top-comments'],
+			hasComments: query['has-comments'],
+		});
 
 		const response: ApiResponse<{ posts: Post[]; metadata: MetaData }> = {
 			statusCode: 200,

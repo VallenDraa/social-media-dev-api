@@ -1,5 +1,10 @@
 import { type UUID } from 'crypto';
-import { type PostEdit, type Post, type PostCreate } from 'src/models';
+import {
+	type PostEdit,
+	type Post,
+	type PostCreate,
+	type PostDetail,
+} from 'src/models';
 import { postRepository, userRepository } from 'src/repositories';
 import { dataStore } from 'src/store';
 import { paginateService } from './pagination.service';
@@ -27,8 +32,23 @@ export const postService = {
 		return newPost;
 	},
 
-	getPosts(limit = 10, page = 1) {
-		const allPosts = postRepository.getPosts(dataStore);
+	getPosts({
+		limit = 10,
+		page = 1,
+		withTopComments = false,
+		hasComments = false,
+	}) {
+		let allPosts = postRepository.getPosts({
+			store: dataStore,
+			hasComments,
+		});
+
+		if (withTopComments) {
+			allPosts = postRepository.populatePostsWithTopComments(
+				dataStore,
+				allPosts,
+			);
+		}
 
 		return paginateService.paginate(allPosts, limit, page);
 	},
@@ -40,7 +60,12 @@ export const postService = {
 			throw Boom.notFound('This post is not found!');
 		}
 
-		return post;
+		const [postDetail] = postRepository.populatePostsWithTopComments(
+			dataStore,
+			[post],
+		);
+
+		return postDetail;
 	},
 
 	updatePost(id: UUID, updatedPostData: PostEdit) {

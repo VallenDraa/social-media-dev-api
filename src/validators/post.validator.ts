@@ -1,5 +1,6 @@
 import Joi from 'joi';
-import { type PostEdit, type Post, type PostCreate } from 'src/models';
+import { type PostEdit, type PostCreate } from 'src/models';
+import { paginateValidator } from './paginate.validator';
 
 export const createPostValidator = Joi.object<PostCreate, true>({
 	description: Joi.string().trim().required().messages({
@@ -42,10 +43,15 @@ export const editPostValidator = Joi.object<PostEdit, true>({
 		.messages({ 'any.required': 'Images are invalid or missing' }),
 });
 
-export const postValidator = createPostValidator.append<Post>({
+export const postValidator = createPostValidator.append({
 	id: Joi.string()
 		.trim()
 		.uuid()
 		.required()
 		.messages({ 'any.required': 'UUID is invalid or missing' }),
+});
+
+export const searchPostValidator = paginateValidator.append({
+	'with-top-comments': Joi.boolean(),
+	'has-comments': Joi.boolean(),
 });
