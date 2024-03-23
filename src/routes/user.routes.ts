@@ -6,7 +6,7 @@ import {
 	createUserValidator,
 	editUserPasswordValidator,
 	editUserValidator,
-} from 'src/validators/user.validator';
+} from 'src/validators';
 
 export const userRoutes: ServerRoute[] = [
 	{

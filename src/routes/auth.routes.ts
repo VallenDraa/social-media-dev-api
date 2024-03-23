@@ -5,7 +5,7 @@ import {
 	loginValidator,
 	refreshTokenValidator,
 	registerValidator,
-} from 'src/validators/auth.validator';
+} from 'src/validators';
 
 export const authRoutes: ServerRoute[] = [
 	{

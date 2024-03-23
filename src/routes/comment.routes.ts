@@ -2,10 +2,7 @@ import { type ServerRoute } from '@hapi/hapi';
 import { commentController } from 'src/controllers';
 import { failAction } from 'src/utils/fail-action-response';
 import { idValidator, postIdValidator } from 'src/validators';
-import {
-	createCommentValidator,
-	editCommentValidator,
-} from 'src/validators/comment.validator';
+import { createCommentValidator, editCommentValidator } from 'src/validators/';
 
 export const commentRoutes: ServerRoute[] = [
 	{
