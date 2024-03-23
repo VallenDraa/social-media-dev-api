@@ -1,7 +1,6 @@
 import request from 'supertest';
 import { type Server } from '@hapi/hapi';
 import { createServer } from 'src/server';
-import { FAKE_USER } from '../helper';
 import {
 	type MetaData,
 	type Post,
@@ -12,6 +11,7 @@ import {
 	type UserWithoutPassword,
 	type PostEdit,
 } from 'src/models';
+import { registerDataMock } from 'src/__tests__/mocks';
 
 describe('Posts e2e', () => {
 	let server: Server;
@@ -30,14 +30,16 @@ describe('Posts e2e', () => {
 		server = await createServer(true);
 
 		// Register fake user
-		await request(server.listener).post('/auth/register').send(FAKE_USER);
+		await request(server.listener)
+			.post('/auth/register')
+			.send(registerDataMock);
 
 		// Get accesss token of fake user
 		accessToken = await request(server.listener)
 			.post('/auth/login')
 			.send({
-				email: FAKE_USER.email,
-				password: FAKE_USER.password,
+				email: registerDataMock.email,
+				password: registerDataMock.password,
 			} as Login)
 			.then(
 				res =>
@@ -135,6 +137,10 @@ describe('Posts e2e', () => {
 					expect(body.message).toStrictEqual('"limit" must be a number');
 				});
 		});
+
+		it.todo(
+			"Should return post with top comments when 'with-top-comments' query is provided",
+		);
 	});
 
 	describe('POST /posts', () => {
@@ -226,6 +232,7 @@ describe('Posts e2e', () => {
 					expect(body.message).toStrictEqual('Images are invalid or missing');
 				});
 		});
+
 		it('Should return 404 when the owner id is not found', async () => {
 			const newPost: PostCreate = {
 				images: ['https://example.com/image.jpg'],

@@ -1,11 +1,14 @@
+import {
+	createDataStoreMock,
+	dataStoreMockTeardown,
+} from 'src/__tests__/mocks';
 import { dataStore } from 'src/store';
-import { storeTestSetup, storeTestTeardown } from '../../helper';
 
 describe('seedStore', () => {
 	let OLD_ENV: NodeJS.ProcessEnv;
 
 	beforeAll(() => {
-		OLD_ENV = storeTestSetup({
+		OLD_ENV = createDataStoreMock({
 			fakeCommentAmount: '10',
 			fakePostAmount: '10',
 			fakeUserAmount: '10',
@@ -13,7 +16,7 @@ describe('seedStore', () => {
 	});
 
 	afterAll(() => {
-		storeTestTeardown(OLD_ENV);
+		dataStoreMockTeardown(OLD_ENV);
 	});
 
 	it('Should have 10 users and posts', () => {

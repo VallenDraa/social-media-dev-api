@@ -1,7 +1,7 @@
 import { dataStore } from 'src/store';
 import { seedStoreInit } from 'src/utils/seed-store';
 
-export const storeTestSetup = ({
+export const createDataStoreMock = ({
 	fakeCommentAmount,
 	fakePostAmount,
 	fakeUserAmount,
@@ -25,6 +25,6 @@ export const storeTestSetup = ({
 	return OLD_ENV;
 };
 
-export const storeTestTeardown = (OLD_ENV: NodeJS.ProcessEnv) => {
+export const dataStoreMockTeardown = (OLD_ENV: NodeJS.ProcessEnv) => {
 	process.env = OLD_ENV;
 };

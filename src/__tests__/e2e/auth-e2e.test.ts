@@ -8,8 +8,8 @@ import {
 import request from 'supertest';
 import { type Server } from '@hapi/hapi';
 import { createServer } from 'src/server';
-import { FAKE_USER } from '../helper';
 import jwt from 'jsonwebtoken';
+import { registerDataMock } from 'src/__tests__/mocks';
 
 describe('Auth e2e', () => {
 	let server: Server;
@@ -27,7 +27,7 @@ describe('Auth e2e', () => {
 				.expect('Content-Type', /json/);
 
 		it('Should register new user and return 201 status code', async () => {
-			await sendRegisterData(FAKE_USER, 201).then(response => {
+			await sendRegisterData(registerDataMock, 201).then(response => {
 				const body = response.body as ApiResponse<null>;
 				expect(body.data).toBeNull();
 				expect(body.message).toStrictEqual('Registration successful');
@@ -36,7 +36,7 @@ describe('Auth e2e', () => {
 		});
 
 		it('Should return 400 status code when there is a duplicate user in the database', async () => {
-			await sendRegisterData(FAKE_USER, 400)
+			await sendRegisterData(registerDataMock, 400)
 				.expect('Content-Type', /json/)
 				.then(response => {
 					const body = response.body as ErrorApiResponse;
