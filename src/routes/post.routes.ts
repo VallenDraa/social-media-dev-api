@@ -5,7 +5,9 @@ import {
 	createPostValidator,
 	editPostValidator,
 	idValidator,
+	paginateValidator,
 	searchPostValidator,
+	userIdValidator,
 } from 'src/validators';
 
 export const postRoutes: ServerRoute[] = [
@@ -19,6 +21,18 @@ export const postRoutes: ServerRoute[] = [
 			},
 		},
 		handler: postController.getPosts,
+	},
+	{
+		path: '/users/{userId}/posts',
+		method: 'GET',
+		options: {
+			validate: {
+				failAction,
+				params: userIdValidator,
+				query: paginateValidator,
+			},
+		},
+		handler: postController.getUserPosts,
 	},
 	{
 		path: '/posts/{id}',

@@ -15,3 +15,11 @@ export const postIdValidator = Joi.object({
 		.required()
 		.messages({ 'any.required': 'UUID is invalid or missing' }),
 });
+
+export const userIdValidator = Joi.object({
+	userId: Joi.string()
+		.trim()
+		.uuid()
+		.required()
+		.messages({ 'any.required': 'UUID is invalid or missing' }),
+});

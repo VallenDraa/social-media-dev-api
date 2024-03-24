@@ -10,7 +10,7 @@ export const postRepository = {
 		}));
 	},
 
-	getPosts({ store, hasComments }: { store: DataStore; hasComments: boolean }) {
+	getPosts(store: DataStore, hasComments: boolean) {
 		const { posts, comments } = store.getState();
 		let results = posts;
 
@@ -25,6 +25,12 @@ export const postRepository = {
 		}
 
 		return results;
+	},
+
+	getUserPosts(store: DataStore, userId: UUID) {
+		const { posts } = store.getState();
+
+		return posts.filter(post => post.owner === userId);
 	},
 
 	getPostById(store: DataStore, id: UUID) {

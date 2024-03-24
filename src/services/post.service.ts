@@ -38,10 +38,7 @@ export const postService = {
 		withTopComments = false,
 		hasComments = false,
 	}) {
-		let allPosts = postRepository.getPosts({
-			store: dataStore,
-			hasComments,
-		});
+		let allPosts = postRepository.getPosts(dataStore, hasComments);
 
 		if (withTopComments) {
 			allPosts = postRepository.populatePostsWithTopComments(
@@ -51,6 +48,18 @@ export const postService = {
 		}
 
 		return paginateService.paginate(allPosts, limit, page);
+	},
+
+	getUserPosts(userId: UUID, limit = 10, page = 1) {
+		const isUserExist = userRepository.getUserById(dataStore, userId);
+
+		if (!isUserExist) {
+			throw Boom.notFound('User not found!');
+		}
+
+		const userPosts = postRepository.getUserPosts(dataStore, userId);
+
+		return paginateService.paginate(userPosts, limit, page);
 	},
 
 	getPostById(id: UUID) {

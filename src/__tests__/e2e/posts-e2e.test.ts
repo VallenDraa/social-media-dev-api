@@ -342,6 +342,114 @@ describe('Posts e2e', () => {
 		});
 	});
 
+	describe('GET /users/:userId/posts', () => {
+		const getUserPosts = (
+			userId: string,
+			page: number | string,
+			limit: number | string,
+		) => {
+			const query = new URLSearchParams();
+
+			if (page) {
+				query.set('page', page.toString());
+			}
+
+			if (limit) {
+				query.set('limit', limit.toString());
+			}
+
+			return request(server.listener)
+				.get(`/users/${userId}/posts?${query.toString()}`)
+				.set('Authorization', `Bearer ${accessToken}`);
+		};
+
+		it('Should return 404 when the user is not found', async () => {
+			const invalidUserId = crypto.randomUUID();
+
+			await getUserPosts(invalidUserId, 1, 10)
+				.expect(404)
+				.then(res => {
+					const body = res.body as ErrorApiResponse;
+
+					expect(body.statusCode).toStrictEqual(404);
+					expect(body.error).toStrictEqual('Not Found');
+					expect(body.message).toStrictEqual('User not found!');
+				});
+		});
+
+		it('Should return 400 when page or limit query is not a number', async () => {
+			const validUserId = fakeUser.id;
+
+			// Invalid page
+			await getUserPosts(validUserId, 'a', 10)
+				.expect(400)
+				.then(res => {
+					const body = res.body as ErrorApiResponse;
+
+					expect(body.statusCode).toStrictEqual(400);
+					expect(body.message).toStrictEqual('"page" must be a number');
+				});
+
+			// Invalid limit
+			await getUserPosts(validUserId, 1, 'b')
+				.expect(400)
+				.then(res => {
+					const body = res.body as ErrorApiResponse;
+
+					expect(body.statusCode).toStrictEqual(400);
+					expect(body.message).toStrictEqual('"limit" must be a number');
+				});
+		});
+
+		it('Should return 400 when userId is not valid', async () => {
+			const invalidUserId = 'invalid-user-id';
+
+			await getUserPosts(invalidUserId, 1, 10)
+				.expect(400)
+				.then(res => {
+					const body = res.body as ErrorApiResponse;
+
+					expect(body.statusCode).toStrictEqual(400);
+					expect(body.error).toStrictEqual('Bad Request');
+					expect(body.message).toStrictEqual('"userId" must be a valid GUID');
+				});
+		});
+
+		it("Should return user's posts when found", async () => {
+			const validUserId = fakeUser.id;
+
+			await getUserPosts(validUserId, 1, 10)
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{
+						posts: Post[];
+						metadata: MetaData;
+					}>;
+
+					expect(body.statusCode).toStrictEqual(200);
+					expect(body.message).toStrictEqual('User posts fetched successfully');
+				});
+		});
+
+		it("Should return the second page of a user's posts and limit to 5 posts per page", async () => {
+			const validUserId = fakeUser.id;
+
+			await getUserPosts(validUserId, 2, 5)
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{
+						posts: Post[];
+						metadata: MetaData;
+					}>;
+
+					expect(body.statusCode).toStrictEqual(200);
+					expect(body.message).toStrictEqual('User posts fetched successfully');
+					expect(body.data.metadata.limit).toStrictEqual(5);
+					expect(body.data.metadata.currentPage).toStrictEqual(2);
+				});
+		});
+	});
+
 	describe('GET /posts/:id', () => {
 		const getPostById = (id: string) =>
 			request(server.listener)

@@ -46,6 +46,21 @@ export const postController = {
 		return h.response(response).code(200);
 	},
 
+	getUserPosts(req: Request, h: ResponseToolkit) {
+		const { userId } = req.params as { userId: UUID };
+		const { page, limit } = req.query as { page: number; limit: number };
+
+		const { data, metadata } = postService.getUserPosts(userId, limit, page);
+
+		const response: ApiResponse<{ posts: Post[]; metadata: MetaData }> = {
+			statusCode: 200,
+			message: 'User posts fetched successfully',
+			data: { posts: data, metadata },
+		};
+
+		return h.response(response).code(200);
+	},
+
 	getPostById(req: Request, h: ResponseToolkit) {
 		const params = req.params as { id: UUID };
 
