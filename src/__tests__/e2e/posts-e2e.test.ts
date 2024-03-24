@@ -13,6 +13,7 @@ import {
 	type PostDetail,
 } from 'src/models';
 import { registerDataMock } from 'src/__tests__/mocks';
+import { type TestCase } from '../types';
 
 describe('Posts e2e', () => {
 	let server: Server;
@@ -242,68 +243,85 @@ describe('Posts e2e', () => {
 		});
 
 		it('Should return 400 when there are missing fields', async () => {
-			await addPost({
-				images: ['https://example.com/image.jpg'],
-				dislikes: [],
-				likes: [],
-				owner: fakeUser.id,
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ApiResponse<{ post: Post }>;
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual(
-						'Description is invalid or missing',
-					);
-				});
-			await addPost({
-				images: ['https://example.com/image.jpg'],
-				dislikes: [],
-				likes: [],
-				description: 'This is a test post',
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ApiResponse<{ post: Post }>;
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Owner is invalid or missing');
-				});
-			await addPost({
-				images: ['https://example.com/image.jpg'],
-				dislikes: [],
-				owner: fakeUser.id,
-				description: 'This is a test post',
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ApiResponse<{ post: Post }>;
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Likes are invalid or missing');
-				});
-			await addPost({
-				images: ['https://example.com/image.jpg'],
-				likes: [],
-				owner: fakeUser.id,
-				description: 'This is a test post',
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ApiResponse<{ post: Post }>;
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Dislikes are invalid or missing');
-				});
-			await addPost({
-				dislikes: [],
-				likes: [],
-				owner: fakeUser.id,
-				description: 'This is a test post',
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ApiResponse<{ post: Post }>;
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Images are invalid or missing');
-				});
+			const testCases: Array<TestCase<Partial<Post>, ErrorApiResponse>> = [
+				{
+					input: {
+						images: ['https://example.com/image.jpg'],
+						dislikes: [],
+						likes: [],
+						owner: fakeUser.id,
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Description is invalid or missing',
+					},
+				},
+				{
+					input: {
+						images: ['https://example.com/image.jpg'],
+						dislikes: [],
+						likes: [],
+						description: 'This is a test post',
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Owner is invalid or missing',
+					},
+				},
+				{
+					input: {
+						images: ['https://example.com/image.jpg'],
+						dislikes: [],
+						owner: fakeUser.id,
+						description: 'This is a test post',
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Likes are invalid or missing',
+					},
+				},
+				{
+					input: {
+						images: ['https://example.com/image.jpg'],
+						likes: [],
+						owner: fakeUser.id,
+						description: 'This is a test post',
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Dislikes are invalid or missing',
+					},
+				},
+				{
+					input: {
+						dislikes: [],
+						likes: [],
+						owner: fakeUser.id,
+						description: 'This is a test post',
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Images are invalid or missing',
+					},
+				},
+			];
+
+			testCases.forEach(async ({ input, expected }) => {
+				await addPost(input)
+					.expect(400)
+					.then(res => {
+						const body = res.body as ErrorApiResponse;
+
+						expect(body.statusCode).toStrictEqual(expected.statusCode);
+						expect(body.error).toStrictEqual(expected.error);
+						expect(body.message).toStrictEqual(expected.message);
+					});
+			});
 		});
 
 		it('Should return 404 when the owner id is not found', async () => {
@@ -420,59 +438,68 @@ describe('Posts e2e', () => {
 		it('Should return 400 when there are missing fields', async () => {
 			const validPost = await getValidPost();
 
-			await updatePost(validPost.id, {
-				dislikes: [],
-				images: [],
-				likes: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
+			const testCases: Array<TestCase<Partial<Post>, ErrorApiResponse>> = [
+				{
+					input: {
+						dislikes: [],
+						images: [],
+						likes: [],
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Description is invalid or missing',
+					},
+				},
+				{
+					input: {
+						description: 'edited a test post',
+						images: [],
+						likes: [],
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Dislikes are invalid or missing',
+					},
+				},
+				{
+					input: {
+						description: 'edited a test post',
+						dislikes: [],
+						likes: [],
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Images are invalid or missing',
+					},
+				},
+				{
+					input: {
+						description: 'edited a test post',
+						dislikes: [],
+						images: [],
+					},
+					expected: {
+						statusCode: 400,
+						error: 'Bad Request',
+						message: 'Likes are invalid or missing',
+					},
+				},
+			];
 
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual(
-						'Description is invalid or missing',
-					);
-				});
+			testCases.forEach(async ({ input, expected }) => {
+				await updatePost(validPost.id, input)
+					.expect(400)
+					.then(res => {
+						const body = res.body as ErrorApiResponse;
 
-			await updatePost(validPost.id, {
-				description: 'edited a test post',
-				images: [],
-				likes: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Dislikes are invalid or missing');
-				});
-
-			await updatePost(validPost.id, {
-				description: 'edited a test post',
-				dislikes: [],
-				likes: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Images are invalid or missing');
-				});
-
-			await updatePost(validPost.id, {
-				description: 'edited a test post',
-				dislikes: [],
-				images: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.message).toStrictEqual('Likes are invalid or missing');
-				});
+						expect(body.statusCode).toStrictEqual(expected.statusCode);
+						expect(body.error).toStrictEqual(expected.error);
+						expect(body.message).toStrictEqual(expected.message);
+					});
+			});
 		});
 
 		it('Should return 404 when adding likes or dislikes with invalid user id', async () => {

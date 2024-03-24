@@ -14,6 +14,7 @@ import {
 import { createServer } from 'src/server';
 import request from 'supertest';
 import { registerDataMock } from 'src/__tests__/mocks';
+import { type TestCase } from '../types';
 
 describe('Comments e2e', () => {
 	let server: Server;
@@ -239,91 +240,89 @@ describe('Comments e2e', () => {
 				});
 		});
 
-		it('Should return 400 if some fields are invalid', async () => {
+		it('Should return 400 when there are missing fields', async () => {
 			const post = await getPost();
 
-			// Empty content field
-			await addComment(post.id, {
-				content: '',
-				dislikes: [],
-				likes: [],
-				owner: fakeUser.id,
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
+			const testCases: Array<TestCase<Partial<Comment>, ErrorApiResponse>> = [
+				{
+					input: {
+						content: '',
+						dislikes: [],
+						likes: [],
+						owner: fakeUser.id,
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: '"content" is not allowed to be empty',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						dislikes: [],
+						likes: [],
+						owner: fakeUser.id,
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'Content is invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						content: 'new comment',
+						likes: [],
+						owner: fakeUser.id,
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'dislikes are invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						content: 'new comment',
+						dislikes: [],
+						owner: fakeUser.id,
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'likes are invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						content: 'new comment',
+						likes: [],
+						dislikes: [],
+						owner: fakeUser.id,
+					},
+					expected: {
+						statusCode: 400,
+						message: 'replies are invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+			];
 
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual(
-						'"content" is not allowed to be empty',
-					);
-				});
+			testCases.forEach(async ({ input, expected }) => {
+				await addComment(post.id, input)
+					.expect(400)
+					.then(res => {
+						const body = res.body as ErrorApiResponse;
 
-			// Missing content field
-			await addComment(post.id, {
-				dislikes: [],
-				likes: [],
-				owner: fakeUser.id,
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('Content is invalid or missing');
-				});
-
-			// Missing dislikes field
-			await addComment(post.id, {
-				content: 'new comment',
-				likes: [],
-				owner: fakeUser.id,
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('dislikes are invalid or missing');
-				});
-
-			// Missing likes field
-			await addComment(post.id, {
-				content: 'new comment',
-				dislikes: [],
-				owner: fakeUser.id,
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('likes are invalid or missing');
-				});
-
-			// Missing replies field
-			await addComment(post.id, {
-				content: 'new comment',
-				likes: [],
-				dislikes: [],
-				owner: fakeUser.id,
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('replies are invalid or missing');
-				});
+						expect(body.statusCode).toStrictEqual(expected.statusCode);
+						expect(body.error).toStrictEqual(expected.error);
+						expect(body.message).toStrictEqual(expected.message);
+					});
+			});
 		});
 
 		it('Should return 404 when post is not found', async () => {
@@ -379,83 +378,81 @@ describe('Comments e2e', () => {
 			const post = await getPost();
 			const comment = post.comments[0];
 
-			// Empty content field
-			await editComment(comment, {
-				content: '',
-				dislikes: [],
-				likes: [],
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
+			const testCases: Array<TestCase<Partial<Comment>, ErrorApiResponse>> = [
+				{
+					input: {
+						content: '',
+						dislikes: [],
+						likes: [],
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: '"content" is not allowed to be empty',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						dislikes: [],
+						likes: [],
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'Content is invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						content: 'new edit content',
+						likes: [],
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'dislikes are invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						content: 'new edit content',
+						dislikes: [],
+						replies: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'likes are invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+				{
+					input: {
+						content: 'new edit content',
+						likes: [],
+						dislikes: [],
+					},
+					expected: {
+						statusCode: 400,
+						message: 'replies are invalid or missing',
+						error: 'Bad Request',
+					},
+				},
+			];
 
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual(
-						'"content" is not allowed to be empty',
-					);
-				});
+			testCases.forEach(async ({ input, expected }) => {
+				await editComment(comment, input)
+					.expect(400)
+					.then(res => {
+						const body = res.body as ErrorApiResponse;
 
-			// Missing content field
-			await editComment(comment, {
-				dislikes: [],
-				likes: [],
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('Content is invalid or missing');
-				});
-
-			// Missing dislikes field
-			await editComment(comment, {
-				content: 'new edit content',
-				likes: [],
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('dislikes are invalid or missing');
-				});
-
-			// Missing likes field
-			await editComment(comment, {
-				content: 'new edit content',
-				dislikes: [],
-				replies: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('likes are invalid or missing');
-				});
-
-			// Missing replies field
-			await editComment(comment, {
-				content: 'new edit content',
-				likes: [],
-				dislikes: [],
-			})
-				.expect(400)
-				.then(res => {
-					const body = res.body as ErrorApiResponse;
-
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
-					expect(body.message).toStrictEqual('replies are invalid or missing');
-				});
+						expect(body.statusCode).toStrictEqual(expected.statusCode);
+						expect(body.error).toStrictEqual(expected.error);
+						expect(body.message).toStrictEqual(expected.message);
+					});
+			});
 		});
 
 		it('Should return 404 when the comment is not found', async () => {
