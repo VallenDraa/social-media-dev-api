@@ -23,6 +23,12 @@ export const userRoutes: ServerRoute[] = [
 	{
 		path: '/users/{id}',
 		method: 'GET',
+		options: {
+			validate: {
+				failAction,
+				params: idValidator,
+			},
+		},
 		handler: userController.getUserById,
 	},
 	{

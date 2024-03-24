@@ -74,7 +74,7 @@ export const userService = {
 		}
 
 		if (user.password !== oldPassword) {
-			throw Boom.badRequest('Current password is incorrect!');
+			throw Boom.unauthorized('Current password is incorrect!');
 		}
 
 		if (oldPassword === newPassword) {
