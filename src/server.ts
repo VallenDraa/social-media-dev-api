@@ -1,11 +1,8 @@
 import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
-import { commentRoutes, postRoutes, userRoutes } from './routes';
-import { seedStoreInit } from './utils/seed-store';
-import { authPlugin } from './plugins/auth.plugin';
-import { dataStore } from './store';
-import { authRoutes } from './routes/auth.routes';
-import { loggerPlugin } from './plugins/logger.plugin';
+import { authRoutes, commentRoutes, postRoutes, userRoutes } from 'src/routes';
+import { loggerPlugin, authPlugin } from 'src/plugins';
+import { seedStoreInit, dataStore, refreshStore } from 'src/store';
 
 export const createServer = async (isTest: boolean) => {
 	dotenv.config();
@@ -15,7 +12,7 @@ export const createServer = async (isTest: boolean) => {
 
 	if (!isTest) {
 		const fiveMinutes = 300_000;
-		setInterval(seedStoreInit, fiveMinutes);
+		refreshStore(fiveMinutes);
 	}
 
 	const server = Hapi.server({
@@ -35,10 +32,6 @@ export const createServer = async (isTest: boolean) => {
 	}
 
 	await authPlugin(server, dataStore);
-
-	if (!isTest) {
-		server.logger.info(`Server running on ${server.info.uri}`);
-	}
 
 	return server;
 };

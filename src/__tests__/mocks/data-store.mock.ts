@@ -1,5 +1,4 @@
-import { dataStore } from 'src/store';
-import { seedStoreInit } from 'src/utils/seed-store';
+import { seedStoreInit, dataStore } from 'src/store';
 
 export const createDataStoreMock = ({
 	fakeCommentAmount,
