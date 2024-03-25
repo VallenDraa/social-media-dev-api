@@ -13,6 +13,10 @@ export const authRoutes: ServerRoute[] = [
 		method: 'POST',
 		options: {
 			auth: false,
+			description: 'Login',
+			notes:
+				'Send login data here to get access token and refresh token. The access token will expire every 10 minutes, after that you can send a refresh token to get a new access token.',
+			tags: ['api'],
 			validate: {
 				failAction,
 				payload: loginValidator,
@@ -25,6 +29,9 @@ export const authRoutes: ServerRoute[] = [
 		method: 'POST',
 		options: {
 			auth: false,
+			description: 'Register',
+			notes: 'Send register data here to upload new user data to the database.',
+			tags: ['api'],
 			validate: {
 				failAction,
 				payload: registerValidator,
@@ -38,6 +45,9 @@ export const authRoutes: ServerRoute[] = [
 		method: 'POST',
 		options: {
 			auth: false,
+			description: 'Refresh Token',
+			notes: 'Send a refresh token here to get new access token.',
+			tags: ['api'],
 			validate: {
 				failAction,
 				payload: refreshTokenValidator,
@@ -48,6 +58,12 @@ export const authRoutes: ServerRoute[] = [
 	{
 		path: '/auth/me',
 		method: 'GET',
+		options: {
+			description: 'Me',
+			notes:
+				'Send an access token here to get the current logged in user detail.',
+			tags: ['api'],
+		},
 		handler: authController.me,
 	},
 ];
