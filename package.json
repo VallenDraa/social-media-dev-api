@@ -5,13 +5,13 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "nodemon | pino-pretty",
-		"build": "etsc --config=etsc.config.js",
-		"start": "node ./dist/src/index.js",
+		"build": "rimraf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+		"start": "node dist/src/index.js",
 		"test": "jest --watch",
 		"test:unit": "jest --watch --testPathPattern=src/__tests__/unit",
 		"test:e2e": "jest --watch --testPathPattern=src/__tests__/e2e",
 		"test:coverage": "jest --coverage",
-		"lint": "eslint ."
+		"lint": "tsc -noEmit && eslint ."
 	},
 	"keywords": [],
 	"author": "",
@@ -22,8 +22,6 @@
 		"@types/supertest": "^6.0.2",
 		"@typescript-eslint/eslint-plugin": ">=7.0.2",
 		"@typescript-eslint/parser": ">=7.0.2",
-		"esbuild": "^0.20.2",
-		"esbuild-node-tsc": "^2.0.5",
 		"eslint": "^8.57.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-config-xo": "^0.44.0",
@@ -34,6 +32,8 @@
 		"rimraf": "^5.0.5",
 		"supertest": "^6.3.4",
 		"ts-jest": "^29.1.2",
+		"ts-node": "^10.9.2",
+		"tsc-alias": "^1.8.8",
 		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.4.2"
 	},

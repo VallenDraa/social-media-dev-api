@@ -3,7 +3,6 @@ import { type UUID } from 'crypto';
 import {
 	type MetaData,
 	type ApiResponse,
-	type User,
 	type UserCreate,
 	type UserEdit,
 	type UserWithoutPassword,

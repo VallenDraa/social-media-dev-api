@@ -6,7 +6,14 @@ module.exports = {
 		node: true,
 	},
 	extends: ['xo', 'xo-typescript', 'prettier'],
-	ignorePatterns: ['dist', 'coverage', 'node_modules'],
+	ignorePatterns: [
+		'dist',
+		'coverage',
+		'node_modules',
+		'jest.config.js',
+		'process-env.d.ts',
+		'.eslintrc.cjs',
+	],
 	parserOptions: {
 		ecmaVersion: 'latest',
 		sourceType: 'module',

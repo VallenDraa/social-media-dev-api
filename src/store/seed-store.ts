@@ -1,5 +1,5 @@
 import { type UUID } from 'crypto';
-import { type Store, type User, type Post, type Comment } from '../models';
+import { type User, type Post, type Comment } from '../models';
 import { type DataStore, dataStore } from '.';
 import {
 	createFakeComment,

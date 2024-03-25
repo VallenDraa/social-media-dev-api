@@ -1,10 +1,5 @@
 import { type UUID } from 'crypto';
-import {
-	type PostEdit,
-	type Post,
-	type PostCreate,
-	type PostDetail,
-} from 'src/models';
+import { type PostEdit, type Post, type PostCreate } from 'src/models';
 import { postRepository, userRepository } from 'src/repositories';
 import { dataStore } from 'src/store';
 import { paginateService } from './pagination.service';
