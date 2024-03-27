@@ -7,12 +7,11 @@ import { version } from '../../package.json';
 export const swaggerPlugin = async (server: Server) => {
 	const options: HapiSwagger.RegisterOptions = {
 		basePath: '/',
-		documentationPath: '/docs',
+		documentationPath: '/',
 		info: {
 			title: "Vallendra's Mock Development API Documentation",
 			contact: {
 				email: 'vallenatwork@gmail.com',
-				license: { name: 'MIT', url: 'https://opensource.org/licenses/MIT' },
 				name: 'VallenDra',
 				url: 'https://www.vallendra.my.id',
 			},
@@ -21,6 +20,8 @@ export const swaggerPlugin = async (server: Server) => {
 			termsOfService: 'https://opensource.org/licenses/MIT',
 			version,
 		},
+		sortEndpoints: 'ordered',
+		uiOptions: { defaultModelsExpandDepth: -1 },
 		schemes: ['http', 'https'],
 	};
 

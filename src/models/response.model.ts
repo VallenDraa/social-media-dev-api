@@ -10,6 +10,10 @@ export type ErrorApiResponse = {
 	error: string;
 };
 
+export type ErrorApiResponseWithAttributes<T> = ErrorApiResponse & {
+	attributes: T;
+};
+
 export type MetaData = {
 	currentPage: number;
 	lastPage: number;

@@ -1,29 +1,15 @@
 import { type ServerRoute } from '@hapi/hapi';
-import { authController } from 'src/controllers/auth.controller';
+import { authSwagger } from './auth.swagger';
+import { authController } from 'src/controllers';
 import { failAction } from 'src/utils/fail-action-response';
 import {
+	authorizationValidator,
 	loginValidator,
 	refreshTokenValidator,
 	registerValidator,
 } from 'src/validators';
 
 export const authRoutes: ServerRoute[] = [
-	{
-		path: '/auth/login',
-		method: 'POST',
-		options: {
-			auth: false,
-			description: 'Login',
-			notes:
-				'Send login data here to get access token and refresh token. The access token will expire every 10 minutes, after that you can send a refresh token to get a new access token.',
-			tags: ['api'],
-			validate: {
-				failAction,
-				payload: loginValidator,
-			},
-		},
-		handler: authController.login,
-	},
 	{
 		path: '/auth/register',
 		method: 'POST',
@@ -36,24 +22,26 @@ export const authRoutes: ServerRoute[] = [
 				failAction,
 				payload: registerValidator,
 			},
+			plugins: { 'hapi-swagger': authSwagger['/auth/register'] },
 		},
 		handler: authController.register,
 	},
-
 	{
-		path: '/auth/refresh-token',
+		path: '/auth/login',
 		method: 'POST',
 		options: {
 			auth: false,
-			description: 'Refresh Token',
-			notes: 'Send a refresh token here to get new access token.',
+			description: 'Login',
+			notes:
+				'Send login data here to get access token and refresh token. The access token will expire every 10 minutes, after that you can send a refresh token to get a new access token.',
 			tags: ['api'],
+			plugins: { 'hapi-swagger': authSwagger['/auth/login'] },
 			validate: {
 				failAction,
-				payload: refreshTokenValidator,
+				payload: loginValidator,
 			},
 		},
-		handler: authController.refreshToken,
+		handler: authController.login,
 	},
 	{
 		path: '/auth/me',
@@ -63,7 +51,28 @@ export const authRoutes: ServerRoute[] = [
 			notes:
 				'Send an access token here to get the current logged in user detail.',
 			tags: ['api'],
+			plugins: { 'hapi-swagger': authSwagger['/auth/me'] },
+			validate: {
+				failAction,
+				headers: authorizationValidator,
+			},
 		},
 		handler: authController.me,
+	},
+	{
+		path: '/auth/refresh-token',
+		method: 'POST',
+		options: {
+			auth: false,
+			description: 'Refresh Token',
+			notes: 'Send a refresh token here to get new access token.',
+			tags: ['api'],
+			plugins: { 'hapi-swagger': authSwagger['/auth/refresh-token'] },
+			validate: {
+				failAction,
+				payload: refreshTokenValidator,
+			},
+		},
+		handler: authController.refreshToken,
 	},
 ];

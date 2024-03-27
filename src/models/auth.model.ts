@@ -27,3 +27,7 @@ export type AccessToken = {
 export type RefreshTokenPayload = {
 	refreshToken: string;
 };
+
+export type AuthorizationPayload = {
+	authorization: string;
+};
