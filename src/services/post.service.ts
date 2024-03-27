@@ -6,12 +6,15 @@ import { paginateService } from './pagination.service';
 import Boom from '@hapi/boom';
 
 export const postService = {
-	addPost(newPostData: PostCreate) {
+	addPost(owner: UUID, newPostData: PostCreate) {
 		const createdAt = new Date().toISOString();
 
 		const newPost: Post = {
 			id: crypto.randomUUID(),
 			...newPostData,
+			owner,
+			likes: [],
+			dislikes: [],
 			createdAt,
 			updatedAt: createdAt,
 		};

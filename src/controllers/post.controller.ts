@@ -11,7 +11,9 @@ import { type UUID } from 'crypto';
 
 export const postController = {
 	addPost(req: Request, h: ResponseToolkit) {
-		const post = postService.addPost(req.payload as PostCreate);
+		const { userId } = req.params as { userId: UUID };
+
+		const post = postService.addPost(userId, req.payload as PostCreate);
 
 		const response: ApiResponse<{ post: Post }> = {
 			statusCode: 201,

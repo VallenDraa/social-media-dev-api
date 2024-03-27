@@ -218,22 +218,19 @@ describe('Posts e2e', () => {
 	});
 
 	describe('POST /posts', () => {
-		const addPost = (newPost: Partial<PostCreate>) =>
+		const addPost = (owner: string, newPost: Partial<PostCreate>) =>
 			request(server.listener)
-				.post('/posts')
+				.post(`/users/${owner}/posts`)
 				.send(newPost)
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should return 201 when post is created successfully', async () => {
 			const newPost: PostCreate = {
 				images: ['https://example.com/image.jpg'],
-				dislikes: [],
-				likes: [],
-				owner: fakeUser.id,
 				description: 'This is a test post',
 			};
 
-			await addPost(newPost)
+			await addPost(fakeUser.id, newPost)
 				.expect(201)
 				.then(res => {
 					const body = res.body as ApiResponse<{ post: Post }>;
@@ -243,13 +240,15 @@ describe('Posts e2e', () => {
 		});
 
 		it('Should return 400 when there are missing fields', async () => {
-			const testCases: Array<TestCase<Partial<Post>, ErrorApiResponse>> = [
+			const testCases: Array<
+				TestCase<{ owner: string; post: Partial<PostCreate> }, ErrorApiResponse>
+			> = [
 				{
 					input: {
-						images: ['https://example.com/image.jpg'],
-						dislikes: [],
-						likes: [],
 						owner: fakeUser.id,
+						post: {
+							images: ['https://example.com/image.jpg'],
+						},
 					},
 					expected: {
 						statusCode: 400,
@@ -259,49 +258,10 @@ describe('Posts e2e', () => {
 				},
 				{
 					input: {
-						images: ['https://example.com/image.jpg'],
-						dislikes: [],
-						likes: [],
-						description: 'This is a test post',
-					},
-					expected: {
-						statusCode: 400,
-						error: 'Bad Request',
-						message: 'Owner is invalid or missing',
-					},
-				},
-				{
-					input: {
-						images: ['https://example.com/image.jpg'],
-						dislikes: [],
 						owner: fakeUser.id,
-						description: 'This is a test post',
-					},
-					expected: {
-						statusCode: 400,
-						error: 'Bad Request',
-						message: 'Likes are invalid or missing',
-					},
-				},
-				{
-					input: {
-						images: ['https://example.com/image.jpg'],
-						likes: [],
-						owner: fakeUser.id,
-						description: 'This is a test post',
-					},
-					expected: {
-						statusCode: 400,
-						error: 'Bad Request',
-						message: 'Dislikes are invalid or missing',
-					},
-				},
-				{
-					input: {
-						dislikes: [],
-						likes: [],
-						owner: fakeUser.id,
-						description: 'This is a test post',
+						post: {
+							description: 'This is a test post',
+						},
 					},
 					expected: {
 						statusCode: 400,
@@ -312,7 +272,7 @@ describe('Posts e2e', () => {
 			];
 
 			testCases.forEach(async ({ input, expected }) => {
-				await addPost(input)
+				await addPost(input.owner, input.post)
 					.expect(400)
 					.then(res => {
 						const body = res.body as ErrorApiResponse;
@@ -325,17 +285,17 @@ describe('Posts e2e', () => {
 		});
 
 		it('Should return 404 when the owner id is not found', async () => {
+			const invalidUserId = crypto.randomUUID();
 			const newPost: PostCreate = {
 				images: ['https://example.com/image.jpg'],
-				dislikes: [],
-				likes: [],
-				owner: crypto.randomUUID(),
 				description: 'This is a test post',
 			};
-			await addPost(newPost)
+
+			await addPost(invalidUserId, newPost)
 				.expect(404)
 				.then(res => {
 					const body = res.body as ApiResponse<{ post: Post }>;
+
 					expect(body.statusCode).toStrictEqual(404);
 					expect(body.message).toStrictEqual('Post owner is not found!');
 				});
