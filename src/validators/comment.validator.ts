@@ -1,39 +1,43 @@
+import { faker } from '@faker-js/faker';
 import Joi from 'joi';
 import { type CommentEdit, type Comment, type CommentCreate } from 'src/models';
+import { emptyArray } from 'src/utils/array-utils';
 
 export const createCommentValidator = Joi.object<CommentCreate, true>({
-	content: Joi.string().trim().required().messages({
-		'any.required': 'Content is invalid or missing',
-	}),
+	content: Joi.string()
+		.trim()
+		.required()
+		.messages({ 'any.required': 'Content is invalid or missing' })
+		.example(faker.lorem.sentence()),
 	owner: Joi.string()
 		.trim()
 		.uuid()
 		.required()
-		.messages({ 'any.required': 'Owner UUID invalid or missing' }),
-	likes: Joi.array().items(Joi.string().trim().uuid()).required().messages({
-		'any.required': 'likes are invalid or missing',
-	}),
-	dislikes: Joi.array().items(Joi.string().trim().uuid()).required().messages({
-		'any.required': 'dislikes are invalid or missing',
-	}),
-	replies: Joi.array().items(Joi.string().trim().uuid()).required().messages({
-		'any.required': 'replies are invalid or missing',
-	}),
+		.messages({ 'any.required': 'Owner UUID invalid or missing' })
+		.example(faker.string.uuid()),
 });
 
 export const editCommentValidator = Joi.object<CommentEdit, true>({
-	content: Joi.string().trim().required().messages({
-		'any.required': 'Content is invalid or missing',
-	}),
-	likes: Joi.array().items(Joi.string().trim().uuid()).required().messages({
-		'any.required': 'likes are invalid or missing',
-	}),
-	dislikes: Joi.array().items(Joi.string().trim().uuid()).required().messages({
-		'any.required': 'dislikes are invalid or missing',
-	}),
-	replies: Joi.array().items(Joi.string().trim().uuid()).required().messages({
-		'any.required': 'replies are invalid or missing',
-	}),
+	content: Joi.string()
+		.trim()
+		.required()
+		.messages({ 'any.required': 'Content is invalid or missing' })
+		.example(faker.lorem.sentence()),
+	likes: Joi.array()
+		.items(Joi.string().trim().uuid())
+		.required()
+		.messages({ 'any.required': 'likes are invalid or missing' })
+		.example(emptyArray(3, () => faker.string.uuid())),
+	dislikes: Joi.array()
+		.items(Joi.string().trim().uuid())
+		.required()
+		.messages({ 'any.required': 'dislikes are invalid or missing' })
+		.example(emptyArray(3, () => faker.string.uuid())),
+	replies: Joi.array()
+		.items(Joi.string().trim().uuid())
+		.required()
+		.messages({ 'any.required': 'replies are invalid or missing' })
+		.example(emptyArray(3, () => faker.string.uuid())),
 });
 
 export const commentValidator = createCommentValidator.append<Comment>({
@@ -41,5 +45,6 @@ export const commentValidator = createCommentValidator.append<Comment>({
 		.trim()
 		.uuid()
 		.required()
-		.messages({ 'any.required': 'UUID is invalid or missing' }),
+		.messages({ 'any.required': 'UUID is invalid or missing' })
+		.example(faker.string.uuid()),
 });

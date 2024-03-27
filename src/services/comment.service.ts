@@ -21,6 +21,9 @@ export const commentService = {
 		const newComment: Comment = {
 			id: crypto.randomUUID(),
 			...newCommentData,
+			likes: [],
+			dislikes: [],
+			replies: [],
 			post: postId,
 			createdAt,
 			updatedAt: createdAt,

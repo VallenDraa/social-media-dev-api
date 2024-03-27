@@ -224,9 +224,6 @@ describe('Comments e2e', () => {
 			const payload: CommentCreate = {
 				content: 'This is a comment',
 				owner: fakeUser.id,
-				replies: [],
-				likes: [],
-				dislikes: [],
 			};
 
 			await addComment(post.id, payload)
@@ -243,15 +240,11 @@ describe('Comments e2e', () => {
 		it('Should return 400 when there are missing fields', async () => {
 			const post = await getPost();
 
-			const testCases: Array<TestCase<Partial<Comment>, ErrorApiResponse>> = [
+			const testCases: Array<
+				TestCase<Partial<CommentCreate>, ErrorApiResponse>
+			> = [
 				{
-					input: {
-						content: '',
-						dislikes: [],
-						likes: [],
-						owner: fakeUser.id,
-						replies: [],
-					},
+					input: { content: '', owner: fakeUser.id },
 					expected: {
 						statusCode: 400,
 						message: '"content" is not allowed to be empty',
@@ -259,12 +252,7 @@ describe('Comments e2e', () => {
 					},
 				},
 				{
-					input: {
-						dislikes: [],
-						likes: [],
-						owner: fakeUser.id,
-						replies: [],
-					},
+					input: { owner: fakeUser.id },
 					expected: {
 						statusCode: 400,
 						message: 'Content is invalid or missing',
@@ -272,41 +260,10 @@ describe('Comments e2e', () => {
 					},
 				},
 				{
-					input: {
-						content: 'new comment',
-						likes: [],
-						owner: fakeUser.id,
-						replies: [],
-					},
+					input: { content: 'new comment' },
 					expected: {
 						statusCode: 400,
-						message: 'dislikes are invalid or missing',
-						error: 'Bad Request',
-					},
-				},
-				{
-					input: {
-						content: 'new comment',
-						dislikes: [],
-						owner: fakeUser.id,
-						replies: [],
-					},
-					expected: {
-						statusCode: 400,
-						message: 'likes are invalid or missing',
-						error: 'Bad Request',
-					},
-				},
-				{
-					input: {
-						content: 'new comment',
-						likes: [],
-						dislikes: [],
-						owner: fakeUser.id,
-					},
-					expected: {
-						statusCode: 400,
-						message: 'replies are invalid or missing',
+						message: 'Owner UUID invalid or missing',
 						error: 'Bad Request',
 					},
 				},
@@ -331,9 +288,6 @@ describe('Comments e2e', () => {
 			await addComment(invalidPostId, {
 				content: 'This is a comment',
 				owner: fakeUser.id,
-				replies: [],
-				likes: [],
-				dislikes: [],
 			})
 				.expect(404)
 				.then(res => {

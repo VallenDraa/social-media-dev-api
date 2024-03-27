@@ -14,7 +14,7 @@ export type Comment = {
 
 export type CommentCreate = Omit<
 	Comment,
-	'id' | 'post' | 'createdAt' | 'updatedAt'
+	'id' | 'post' | 'likes' | 'dislikes' | 'replies' | 'createdAt' | 'updatedAt'
 >;
 export type CommentEdit = Omit<
 	Comment,
