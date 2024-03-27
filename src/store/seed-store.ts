@@ -1,19 +1,19 @@
 import { type UUID } from 'crypto';
-import { type User, type Post, type Comment } from '../models';
+import { type User, type Post, type Comment } from 'src/models';
 import { type DataStore, dataStore } from '.';
 import {
 	createFakeComment,
 	createFakeUser,
 	createFakePost,
-} from '../utils/fake-data';
+} from 'src/utils/fake-data';
 import {
+	emptyArray,
 	getRandomFromArray,
 	getRandomsFromArray,
-} from '../utils/get-randoms-from-array';
+} from 'src/utils/array-utils';
 import { faker } from '@faker-js/faker';
 
 const randInt = (min: number, max: number) => faker.number.int({ min, max });
-const emptyArray = <T>(length: number) => [...new Array<T>(length)];
 
 const getRandomRepliesAmount = (
 	fakeCommentRepliesLength: number,
