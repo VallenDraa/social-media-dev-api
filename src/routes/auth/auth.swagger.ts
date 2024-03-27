@@ -9,10 +9,13 @@ import {
 } from 'src/models';
 
 export const authSwagger: Record<
-	'/auth/register' | '/auth/login' | '/auth/me' | '/auth/refresh-token',
+	| 'POST /auth/register'
+	| 'POST /auth/login'
+	| 'GET /auth/me'
+	| 'POST /auth/refresh-token',
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
 > = {
-	'/auth/register': {
+	'POST /auth/register': {
 		responses: {
 			'200': {
 				description: 'Returns success status.',
@@ -44,7 +47,7 @@ export const authSwagger: Record<
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
-	'/auth/login': {
+	'POST /auth/login': {
 		responses: {
 			'200': {
 				description: 'Returns status code with access token and refresh token.',
@@ -89,7 +92,7 @@ export const authSwagger: Record<
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
-	'/auth/me': {
+	'GET /auth/me': {
 		responses: {
 			'200': {
 				description: 'Returns user detail.',
@@ -150,7 +153,7 @@ export const authSwagger: Record<
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
-	'/auth/refresh-token': {
+	'POST /auth/refresh-token': {
 		responses: {
 			'200': {
 				description: 'Returns new access token.',

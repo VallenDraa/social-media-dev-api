@@ -20,6 +20,8 @@ export const swaggerPlugin = async (server: Server) => {
 			termsOfService: 'https://opensource.org/licenses/MIT',
 			version,
 		},
+		routeTag: tags => !tags.includes('private') && tags.includes('api'),
+		grouping: 'tags',
 		sortEndpoints: 'ordered',
 		uiOptions: { defaultModelsExpandDepth: -1 },
 		schemes: ['http', 'https'],

@@ -17,12 +17,12 @@ export const authRoutes: ServerRoute[] = [
 			auth: false,
 			description: 'Register',
 			notes: 'Send register data here to upload new user data to the database.',
-			tags: ['api'],
+			tags: ['api', 'auth'],
 			validate: {
 				failAction,
 				payload: registerValidator,
 			},
-			plugins: { 'hapi-swagger': authSwagger['/auth/register'] },
+			plugins: { 'hapi-swagger': authSwagger['POST /auth/register'] },
 		},
 		handler: authController.register,
 	},
@@ -34,8 +34,8 @@ export const authRoutes: ServerRoute[] = [
 			description: 'Login',
 			notes:
 				'Send login data here to get access token and refresh token. The access token will expire every 10 minutes, after that you can send a refresh token to get a new access token.',
-			tags: ['api'],
-			plugins: { 'hapi-swagger': authSwagger['/auth/login'] },
+			tags: ['api', 'auth'],
+			plugins: { 'hapi-swagger': authSwagger['POST /auth/login'] },
 			validate: {
 				failAction,
 				payload: loginValidator,
@@ -50,8 +50,8 @@ export const authRoutes: ServerRoute[] = [
 			description: 'Me',
 			notes:
 				'Send an access token here to get the current logged in user detail.',
-			tags: ['api'],
-			plugins: { 'hapi-swagger': authSwagger['/auth/me'] },
+			tags: ['api', 'auth'],
+			plugins: { 'hapi-swagger': authSwagger['GET /auth/me'] },
 			validate: {
 				failAction,
 				headers: authorizationValidator,
@@ -66,8 +66,8 @@ export const authRoutes: ServerRoute[] = [
 			auth: false,
 			description: 'Refresh Token',
 			notes: 'Send a refresh token here to get new access token.',
-			tags: ['api'],
-			plugins: { 'hapi-swagger': authSwagger['/auth/refresh-token'] },
+			tags: ['api', 'auth'],
+			plugins: { 'hapi-swagger': authSwagger['POST /auth/refresh-token'] },
 			validate: {
 				failAction,
 				payload: refreshTokenValidator,
