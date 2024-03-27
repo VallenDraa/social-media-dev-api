@@ -10,6 +10,7 @@ import {
 import { emptyArray } from 'src/utils/array-utils';
 import { createFakeCommentExample } from 'src/utils/fake-data';
 import { commentValidator } from 'src/validators';
+import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
 
 export const commentSwagger: Record<
 	| 'GET /posts/{postId}/comments'
@@ -20,6 +21,7 @@ export const commentSwagger: Record<
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
 > = {
 	'POST /posts/{postId}/comments': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'201': {
 				description: 'Returns the newly created comment.',
@@ -53,6 +55,7 @@ export const commentSwagger: Record<
 		payloadType: 'json',
 	},
 	'GET /posts/{postId}/comments': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'200': {
 				description: 'Returns the comments of a post.',
@@ -105,6 +108,7 @@ export const commentSwagger: Record<
 		payloadType: 'json',
 	},
 	'GET /comments/{id}': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'200': {
 				description: 'Returns the comment data from the given comment id.',
@@ -145,6 +149,7 @@ export const commentSwagger: Record<
 		payloadType: 'json',
 	},
 	'PUT /comments/{id}': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'200': {
 				description: 'Returns the new edited comment.',
@@ -186,6 +191,7 @@ export const commentSwagger: Record<
 		payloadType: 'json',
 	},
 	'DELETE /comments/{id}': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'200': {
 				description: 'Returns the id of the deleted comment .',

@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import Joi from 'joi';
+import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
 import {
 	type UserWithoutPassword,
 	type ApiResponse,
@@ -93,6 +94,7 @@ export const authSwagger: Record<
 		payloadType: 'json',
 	},
 	'GET /auth/me': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'200': {
 				description: 'Returns user detail.',

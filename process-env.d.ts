@@ -7,6 +7,6 @@ declare namespace NodeJS {
 		FAKE_COMMENT_AMOUNT: string;
 		ACCESS_TOKEN_SECRET: string;
 		REFRESH_TOKEN_SECRET: string;
-		NODE_ENV: string;
+		NODE_ENV: 'production' | 'development' | 'test';
 	}
 }
