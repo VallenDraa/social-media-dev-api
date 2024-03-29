@@ -1,4 +1,4 @@
 export * from './post';
-export * from './user.routes';
+export * from './user';
 export * from './comment';
 export * from './auth';

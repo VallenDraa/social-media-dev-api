@@ -5,7 +5,8 @@ export const idValidator = Joi.object({
 		.trim()
 		.uuid()
 		.required()
-		.messages({ 'any.required': 'UUID is invalid or missing' }),
+		.messages({ 'any.required': 'UUID is invalid or missing' })
+		.example(crypto.randomUUID()),
 });
 
 export const postIdValidator = Joi.object({
@@ -13,7 +14,8 @@ export const postIdValidator = Joi.object({
 		.trim()
 		.uuid()
 		.required()
-		.messages({ 'any.required': 'UUID is invalid or missing' }),
+		.messages({ 'any.required': 'UUID is invalid or missing' })
+		.example(crypto.randomUUID()),
 });
 
 export const userIdValidator = Joi.object({
@@ -21,5 +23,6 @@ export const userIdValidator = Joi.object({
 		.trim()
 		.uuid()
 		.required()
-		.messages({ 'any.required': 'UUID is invalid or missing' }),
+		.messages({ 'any.required': 'UUID is invalid or missing' })
+		.example(crypto.randomUUID()),
 });
