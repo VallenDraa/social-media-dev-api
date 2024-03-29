@@ -1,7 +1,7 @@
 {
-	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"version": 2,
-	"rewrites": [{ "source": "/(.*)", "destination": "/dist" }],
+	"builds": [{ "src": "dist/src/index.js", "use": "@vercel/node" }],
+	"routes": [{ "src": "/(.*)", "dest": "/" }],
 	"installCommand": "pnpm install",
 	"buildCommand": "pnpm build",
 	"outputDirectory": "dist"
