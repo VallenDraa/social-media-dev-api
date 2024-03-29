@@ -1,13 +1,14 @@
-import { faker } from '@faker-js/faker';
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
-import Joi from 'joi';
 import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
+import { type UserWithoutPassword } from 'src/models';
+import { createFakeUserExample } from 'src/utils/fake-data';
 import {
-	type UserWithoutPassword,
-	type ApiResponse,
-	type ErrorApiResponse,
-	type ErrorApiResponseWithAttributes,
-} from 'src/models';
+	apiResponse,
+	badRequestApiResponse,
+	notFoundApiResponse,
+	serverErrorApiResponse,
+	unauthorizedApiResponse,
+} from 'src/validators';
 
 export const authSwagger: Record<
 	| 'POST /auth/register'
@@ -18,31 +19,17 @@ export const authSwagger: Record<
 > = {
 	'POST /auth/register': {
 		responses: {
-			'200': {
+			'201': {
 				description: 'Returns success status.',
-				schema: Joi.object<ApiResponse<null>>({
-					statusCode: Joi.number().example(201),
-					message: Joi.string().example('Registration successful'),
-					data: Joi.valid(null).example(null),
-				}),
+				schema: apiResponse<null>(null, 'Registration successful', 201),
 			},
 			'400': {
 				description: 'Can be because of invalid credentials or duplicate user.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					message: Joi.string().example(
-						'Password and confirm password do not match',
-					),
-					error: Joi.string().example('Bad Request'),
-				}),
+				schema: badRequestApiResponse(
+					'Password and confirm password do not match',
+				),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 1,
 		produces: ['application/json'],
@@ -52,42 +39,24 @@ export const authSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns status code with access token and refresh token.',
-				schema: Joi.object<
-					ApiResponse<{ accessToken: string; refreshToken: string }>,
-					true
-				>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Login successful'),
-					data: Joi.object({
-						accessToken: Joi.string().example('Some JWT Access Token'),
-						refreshToken: Joi.string().example('Some JWT Refresh Token'),
-					}),
-				}),
+				schema: apiResponse<{ accessToken: string; refreshToken: string }>(
+					{
+						accessToken: crypto.randomUUID(),
+						refreshToken: crypto.randomUUID(),
+					},
+					'Login successful',
+				),
 			},
 			'400': {
 				description:
 					'Happens when there is an invalid field sent from the client.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					message: Joi.string().example('Email is invalid or missing'),
-					error: Joi.string().example('Bad Request'),
-				}),
+				schema: badRequestApiResponse('Email is invalid or missing'),
 			},
 			'401': {
 				description: 'Happens when email or password is incorrect.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(401),
-					message: Joi.string().example('Invalid email or password'),
-					error: Joi.string().example('Unauthorized'),
-				}),
+				schema: unauthorizedApiResponse('Invalid email or password'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 2,
 		produces: ['application/json'],
@@ -98,58 +67,25 @@ export const authSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns user detail.',
-				schema: Joi.object<ApiResponse<{ user: UserWithoutPassword }>, true>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example(
-						'Successfully get current user details',
-					),
-					data: Joi.object({
-						user: Joi.object({
-							id: Joi.string().uuid().example(crypto.randomUUID()),
-							profilePicture: Joi.string().example(faker.image.avatar()),
-							username: Joi.string().example(faker.internet.userName()),
-							email: Joi.string().email().example(faker.internet.email()),
-							createdAt: Joi.string().isoDate().example(faker.date.past()),
-							updatedAt: Joi.string().isoDate().example(faker.date.recent()),
-						}).label('User'),
-					}),
-				}),
+				schema: apiResponse<{ user: UserWithoutPassword }>(
+					{ user: createFakeUserExample() },
+					'Successfully get current user details',
+				),
 			},
 			'400': {
 				description:
 					'Happens when the user id cannot be retrieved from access token.',
-				schema: Joi.object<ErrorApiResponse, true>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('User ID is required'),
-				}),
+				schema: badRequestApiResponse('User ID is required'),
 			},
 			'401': {
 				description: 'Happens when access token is invalid or expired.',
-				schema: Joi.object<ErrorApiResponseWithAttributes<{ error: string }>>({
-					statusCode: Joi.number().example(401),
-					message: Joi.string().example('Expired token'),
-					error: Joi.string().example('Unauthorized'),
-					attributes: {
-						error: 'Expired token',
-					},
-				}),
+				schema: unauthorizedApiResponse('Expired token'),
 			},
 			'404': {
 				description: 'Happens when the given user cannot be found.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					message: Joi.string().example('User not found'),
-					error: Joi.string().example('Not Found'),
-				}),
+				schema: notFoundApiResponse('User not found'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 3,
 		produces: ['application/json'],
@@ -159,37 +95,20 @@ export const authSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns new access token.',
-				schema: Joi.object<ApiResponse<{ accessToken: string }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Successfully refreshed access token'),
-					data: Joi.object({
-						accessToken: Joi.string().example('Some JWT Access Token'),
-					}),
-				}),
+				schema: apiResponse<{ accessToken: string }>(
+					{ accessToken: crypto.randomUUID() },
+					'Successfully refreshed access token',
+				),
 			},
 			'400': {
 				description: 'Happens when refresh token is missing or invalid.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('Refresh token is required'),
-				}),
+				schema: badRequestApiResponse('Refresh token is required'),
 			},
 			'401': {
 				description: 'Happens when refresh token is expired.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(401),
-					error: Joi.string().example('Unauthorized'),
-					message: Joi.string().example('Refresh token expired'),
-				}),
+				schema: unauthorizedApiResponse('Refresh token expired'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
 		produces: ['application/json'],

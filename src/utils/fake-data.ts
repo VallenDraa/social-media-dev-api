@@ -1,7 +1,28 @@
-import { type User, type Comment, type Post } from 'src/models';
+import {
+	type User,
+	type Comment,
+	type Post,
+	type UserWithoutPassword,
+} from 'src/models';
 import { type UUID } from 'crypto';
 import { faker } from '@faker-js/faker';
 import { emptyArray } from './array-utils';
+
+/**
+ * @returns Fake user without password for real API response
+ */
+export const createFakeUserWithoutPassword = (): UserWithoutPassword => ({
+	id: crypto.randomUUID(),
+	profilePicture: faker.image.avatar(),
+	username: faker.internet.userName(),
+	email: faker.internet.email(),
+	createdAt: faker.date
+		.recent({ days: 30, refDate: new Date('2022-01-01') })
+		.toISOString(),
+	updatedAt: faker.date
+		.recent({ days: 30, refDate: new Date('2023-01-01') })
+		.toISOString(),
+});
 
 /**
  * @returns Fake user for real API response
@@ -78,6 +99,12 @@ export const createFakeComment = ({
 		.recent({ days: 30, refDate: new Date('2023-01-01') })
 		.toISOString(),
 });
+
+/**
+ * @returns Fake user without password for swagger example response
+ */
+export const createFakeUserWithoutPasswordExample =
+	createFakeUserWithoutPassword;
 
 /**
  * @returns Fake user for swagger example response

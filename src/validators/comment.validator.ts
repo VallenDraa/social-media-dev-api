@@ -47,4 +47,6 @@ export const commentValidator = createCommentValidator.append<Comment>({
 		.required()
 		.messages({ 'any.required': 'UUID is invalid or missing' })
 		.example(faker.string.uuid()),
+	createdAt: Joi.string().isoDate().required().example(faker.date.recent()),
+	updatedAt: Joi.string().isoDate().required().example(faker.date.recent()),
 });

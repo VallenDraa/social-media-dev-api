@@ -10,14 +10,14 @@ export const swaggerPlugin = async (server: Server) => {
 		basePath: '/',
 		documentationPath: '/',
 		info: {
-			title: "Vallendra's Mock Development API Documentation",
+			title: 'Social Media Mock Development API Documentation',
 			contact: {
 				email: 'vallenatwork@gmail.com',
 				name: 'VallenDra',
 				url: 'https://www.vallendra.my.id',
 			},
 			description:
-				"This is a mock social media API for when I'm learning new things on frontend that requires a REST API.",
+				'This is a mock social media API that is used for learning new things on frontend that requires a REST API.',
 			termsOfService: 'https://opensource.org/licenses/MIT',
 			version,
 		},
@@ -34,7 +34,8 @@ export const swaggerPlugin = async (server: Server) => {
 				type: 'apiKey',
 			},
 		},
-		uiOptions: { defaultModelsExpandDepth: -1 },
+		OAS: 'v3.0',
+		uiOptions: { defaultModelsExpandDepth: -1, layout: 'BaseLayout' },
 		schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http'],
 	};
 

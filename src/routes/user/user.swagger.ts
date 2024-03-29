@@ -2,7 +2,6 @@ import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import Joi from 'joi';
 import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
 import type {
-	ApiResponse,
 	ErrorApiResponse,
 	MetaData,
 	UserWithoutPassword,
@@ -10,9 +9,10 @@ import type {
 import { emptyArray } from 'src/utils/array-utils';
 import { createFakeUserExample } from 'src/utils/fake-data';
 import {
-	metadataValidator,
-	userIdValidator,
-	userWithoutPasswordValidator,
+	apiResponse,
+	badRequestApiResponse,
+	notFoundApiResponse,
+	serverErrorApiResponse,
 } from 'src/validators';
 
 export const usersSwagger: Record<
@@ -29,27 +29,17 @@ export const usersSwagger: Record<
 		responses: {
 			'201': {
 				description: 'Returns the newly created user',
-				schema: Joi.object<ApiResponse<{ user: UserWithoutPassword }>>({
-					statusCode: Joi.number().example(201),
-					message: Joi.string().example('User created successfully'),
-					data: Joi.object({ user: userWithoutPasswordValidator }),
-				}),
+				schema: apiResponse<{ user: UserWithoutPassword }>(
+					{ user: createFakeUserExample() },
+					'User created successfully',
+					201,
+				),
 			},
 			'400': {
 				description: 'Happens when some field is invalid or missing',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('Email is invalid or missing'),
-				}),
+				schema: badRequestApiResponse('Email is invalid or missing'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 1,
 		produces: ['application/json'],
@@ -60,34 +50,22 @@ export const usersSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns Users in a paginated manner.',
-				schema: Joi.object<
-					ApiResponse<{ users: UserWithoutPassword[]; metadata: MetaData }>
-				>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Users fetched successfully'),
-					data: Joi.object({
-						users: Joi.array()
-							.items(userWithoutPasswordValidator)
-							.example(emptyArray(3, createFakeUserExample)),
-						metadata: metadataValidator,
-					}),
-				}),
+				schema: apiResponse<{
+					users: UserWithoutPassword[];
+					metadata: MetaData;
+				}>(
+					{
+						users: emptyArray(3, createFakeUserExample),
+						metadata: { currentPage: 1, lastPage: 1, limit: 3, total: 3 },
+					},
+					'Users fetched successfully',
+				),
 			},
 			'400': {
 				description: 'Happens when some query parameters are invalid',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('"page" must be a number'),
-				}),
+				schema: badRequestApiResponse('"page" must be a number'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 2,
 		produces: ['application/json'],
@@ -98,27 +76,16 @@ export const usersSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns a single user from the given id.',
-				schema: Joi.object<ApiResponse<{ user: UserWithoutPassword }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('User fetched successfully'),
-					data: Joi.object({ user: userWithoutPasswordValidator }),
-				}),
+				schema: apiResponse<{ user: UserWithoutPassword }>(
+					{ user: createFakeUserExample() },
+					'User fetched successfully',
+				),
 			},
 			'404': {
 				description: 'Happens when the given user id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('User not found!'),
-				}),
+				schema: notFoundApiResponse('User not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 3,
 		produces: ['application/json'],
@@ -129,27 +96,16 @@ export const usersSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Edits an existing user.',
-				schema: Joi.object<ApiResponse<{ user: UserWithoutPassword }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('User updated successfully'),
-					data: Joi.object({ user: userWithoutPasswordValidator }),
-				}),
+				schema: apiResponse<{ user: UserWithoutPassword }>(
+					{ user: createFakeUserExample() },
+					'User updated successfully',
+				),
 			},
 			'404': {
 				description: 'Happens when the given user id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('User not found!'),
-				}),
+				schema: notFoundApiResponse('User not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
 		produces: ['application/json'],
@@ -160,21 +116,16 @@ export const usersSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the id of the edited user password.',
-				schema: Joi.object<ApiResponse<{ userId: string }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('User password updated successfully'),
-					data: Joi.object({ userId: userIdValidator }),
-				}),
+				schema: apiResponse<{ userId: string }>(
+					{ userId: crypto.randomUUID() },
+					'User password updated successfully',
+				),
 			},
 			'400': {
 				description: 'Happens when password is the same',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example(
-						'The new password must be different from the old password!',
-					),
-				}),
+				schema: badRequestApiResponse(
+					'The new password must be different from the old password!',
+				),
 			},
 			'401': {
 				description: 'Happens when password confirmation is wrong.',
@@ -186,19 +137,9 @@ export const usersSwagger: Record<
 			},
 			'404': {
 				description: 'Happens when the given user id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('User not found!'),
-				}),
+				schema: notFoundApiResponse('User not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 5,
 		produces: ['application/json'],
@@ -209,27 +150,16 @@ export const usersSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the deleted user id.',
-				schema: Joi.object<ApiResponse<{ userId: string }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('User deleted successfully'),
-					data: Joi.object({ userId: userIdValidator }),
-				}),
+				schema: apiResponse<{ userId: string }>(
+					{ userId: crypto.randomUUID() },
+					'User deleted successfully',
+				),
 			},
 			'404': {
 				description: 'Happens when the given user id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('User not found!'),
-				}),
+				schema: notFoundApiResponse('User not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 6,
 		produces: ['application/json'],

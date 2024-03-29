@@ -1,10 +1,14 @@
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
-import Joi from 'joi';
 import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
-import type { ApiResponse, ErrorApiResponse, MetaData, Post } from 'src/models';
+import type { MetaData, Post } from 'src/models';
 import { emptyArray } from 'src/utils/array-utils';
 import { createFakePostExample } from 'src/utils/fake-data';
-import { postValidator } from 'src/validators';
+import {
+	apiResponse,
+	badRequestApiResponse,
+	notFoundApiResponse,
+} from 'src/validators';
+import { serverErrorApiResponse } from 'src/validators';
 
 export const postsSwagger: Record<
 	| 'GET /posts'
@@ -20,37 +24,21 @@ export const postsSwagger: Record<
 		responses: {
 			'201': {
 				description: 'Returns the newly created post',
-				schema: Joi.object<ApiResponse<{ post: Post }>>({
-					statusCode: Joi.number().example(201),
-					message: Joi.string().example('Post created successfully'),
-					data: Joi.object({
-						post: postValidator.example(createFakePostExample()),
-					}),
-				}),
+				schema: apiResponse<{ post: Post }>(
+					{ post: createFakePostExample() },
+					'Post created successfully',
+					201,
+				),
 			},
 			'400': {
 				description: 'Happens when some field is invalid or missing',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('Description is invalid or missing'),
-				}),
+				schema: badRequestApiResponse('Description is invalid or missing'),
 			},
 			'404': {
 				description: 'Happens when the given user id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('Post owner is not found!'),
-				}),
+				schema: notFoundApiResponse('Post owner is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 1,
 		produces: ['application/json'],
@@ -61,37 +49,19 @@ export const postsSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns posts in a paginated manner.',
-				schema: Joi.object<ApiResponse<{ posts: Post[]; metadata: MetaData }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Posts fetched successfully'),
-					data: Joi.object({
-						posts: Joi.array()
-							.items(postValidator)
-							.example(emptyArray(3, createFakePostExample)),
-						metadata: Joi.object({
-							currentPage: Joi.number().example(1),
-							lastPage: Joi.number().example(1),
-							limit: Joi.number().example(3),
-							total: Joi.number().example(3),
-						}),
-					}),
-				}),
+				schema: apiResponse<{ posts: Post[]; metadata: MetaData }>(
+					{
+						posts: emptyArray(3, createFakePostExample),
+						metadata: { currentPage: 1, lastPage: 1, limit: 3, total: 3 },
+					},
+					'Posts fetched successfully',
+				),
 			},
 			'400': {
 				description: 'Happens when some query parameters are invalid',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('"page" must be a number'),
-				}),
+				schema: badRequestApiResponse('"page" must be a number'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 2,
 		produces: ['application/json'],
@@ -102,37 +72,19 @@ export const postsSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns posts of a user in a paginated manner.',
-				schema: Joi.object<ApiResponse<{ posts: Post[]; metadata: MetaData }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Posts fetched successfully'),
-					data: Joi.object({
-						posts: Joi.array()
-							.items(postValidator)
-							.example(emptyArray(3, createFakePostExample)),
-						metadata: Joi.object({
-							currentPage: Joi.number().example(1),
-							lastPage: Joi.number().example(1),
-							limit: Joi.number().example(3),
-							total: Joi.number().example(3),
-						}),
-					}),
-				}),
+				schema: apiResponse<{ posts: Post[]; metadata: MetaData }>(
+					{
+						posts: emptyArray(3, createFakePostExample),
+						metadata: { currentPage: 1, lastPage: 1, limit: 3, total: 3 },
+					},
+					'Posts fetched successfully',
+				),
 			},
 			'404': {
 				description: 'Happens when the given user id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('Post owner is not found!'),
-				}),
+				schema: notFoundApiResponse('Post owner is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 3,
 		produces: ['application/json'],
@@ -143,27 +95,16 @@ export const postsSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns a single post from the given post id.',
-				schema: Joi.object<ApiResponse<{ post: Post }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Posts fetched successfully'),
-					data: { post: postValidator.example(createFakePostExample()) },
-				}),
+				schema: apiResponse<{ post: Post }>(
+					{ post: createFakePostExample() },
+					'Post fetched successfully',
+				),
 			},
 			'404': {
 				description: 'Happens when the given post id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('This Post is not found!'),
-				}),
+				schema: notFoundApiResponse('This Post is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
 		produces: ['application/json'],
@@ -174,36 +115,21 @@ export const postsSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the edited post.',
-				schema: Joi.object<ApiResponse<{ post: Post }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Post updated successfully'),
-					data: { post: postValidator.example(createFakePostExample()) },
-				}),
+				schema: apiResponse<{ post: Post }>(
+					{ post: createFakePostExample() },
+					'Post updated successfully',
+				),
 			},
 			'400': {
 				description: 'Happens when some fields are invalid',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('Likes are invalid or missing'),
-				}),
+				schema: badRequestApiResponse('Likes are invalid or missing'),
 			},
 			'404': {
 				description:
 					'Happens when the given post id is missing or likes/dislikes user id are invalid.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('This Post is not found!'),
-				}),
+				schema: notFoundApiResponse('This Post is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 5,
 		produces: ['application/json'],
@@ -214,27 +140,16 @@ export const postsSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the deleted post id.',
-				schema: Joi.object<ApiResponse<{ postId: string }>>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Post deleted successfully'),
-					data: { postId: crypto.randomUUID() },
-				}),
+				schema: apiResponse<{ postId: string }>(
+					{ postId: crypto.randomUUID() },
+					'Post deleted successfully',
+				),
 			},
 			'404': {
 				description: 'Happens when the given post id is missing.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					error: Joi.string().example('Not Found'),
-					message: Joi.string().example('This Post is not found!'),
-				}),
+				schema: notFoundApiResponse('This Post is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 6,
 		produces: ['application/json'],

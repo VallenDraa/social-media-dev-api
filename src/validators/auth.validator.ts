@@ -15,7 +15,7 @@ export const loginValidator = Joi.object<Login, true>({
 	password: Joi.string().trim().min(8).required().messages({
 		'any.required': 'Password is invalid or missing',
 	}),
-}).label('Login Model');
+}).label('Login');
 
 export const registerValidator = Joi.object<RegisterData, true>({
 	username: Joi.string()
@@ -41,14 +41,14 @@ export const registerValidator = Joi.object<RegisterData, true>({
 		.required()
 		.messages({ 'any.required': 'Password confirmation is invalid or missing' })
 		.example('moreThan8Chars'),
-}).label('Register Model');
+}).label('Register');
 
 export const refreshTokenValidator = Joi.object<RefreshTokenPayload, true>({
 	refreshToken: Joi.string()
 		.trim()
 		.required()
 		.messages({ 'any.required': 'Refresh token is invalid or missing' }),
-}).label('Refresh Token Model');
+}).label('RefreshToken');
 
 export const authorizationValidator = Joi.object<AuthorizationPayload, true>({
 	authorization: Joi.string()
@@ -57,4 +57,4 @@ export const authorizationValidator = Joi.object<AuthorizationPayload, true>({
 		.messages({ 'any.required': 'Access token is invalid or missing' }),
 })
 	.unknown(true)
-	.label('Authorization Model (Access Token)');
+	.label('AuthorizationHeader');

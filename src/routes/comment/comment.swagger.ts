@@ -1,15 +1,14 @@
 import { type UUID } from 'crypto';
-import { faker } from '@faker-js/faker';
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
-import Joi from 'joi';
-import {
-	type ApiResponse,
-	type ErrorApiResponse,
-	type MetaData,
-} from 'src/models';
+import { type Comment, type MetaData } from 'src/models';
 import { emptyArray } from 'src/utils/array-utils';
 import { createFakeCommentExample } from 'src/utils/fake-data';
-import { commentValidator } from 'src/validators';
+import {
+	apiResponse,
+	badRequestApiResponse,
+	notFoundApiResponse,
+	serverErrorApiResponse,
+} from 'src/validators';
 import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
 
 export const commentSwagger: Record<
@@ -25,30 +24,18 @@ export const commentSwagger: Record<
 		responses: {
 			'201': {
 				description: 'Returns the newly created comment.',
-				schema: Joi.object<ApiResponse<{ comment: Comment }>>({
-					statusCode: Joi.number().example(201),
-					message: Joi.string().example('Registration successful'),
-					data: commentValidator,
-				}),
+				schema: apiResponse<{ comment: Comment }>(
+					{ comment: createFakeCommentExample() },
+					'Registration successful',
+					201,
+				),
 			},
 			'404': {
 				description:
 					'Happens because the post retrieved from the post id is not found.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					message: Joi.string().example(
-						'The post for this comment is missing!',
-					),
-					error: Joi.string().example('Not Found'),
-				}),
+				schema: notFoundApiResponse('The post for this comment is missing!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 1,
 		produces: ['application/json'],
@@ -59,49 +46,24 @@ export const commentSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the comments of a post.',
-				schema: Joi.object<
-					ApiResponse<{ comments: Comment[]; metadata: MetaData }>,
-					true
-				>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Comments fetched successfully'),
-					data: Joi.object({
-						comments: commentValidator.example(
-							emptyArray(4, createFakeCommentExample),
-						),
-						metadata: Joi.object({
-							currentPage: Joi.number().example(1),
-							lastPage: Joi.number().example(1),
-							limit: Joi.number().example(4),
-							total: Joi.number().example(4),
-						}),
-					}),
-				}),
+				schema: apiResponse<{ comments: Comment[]; metadata: MetaData }>(
+					{
+						comments: emptyArray(3, createFakeCommentExample),
+						metadata: { currentPage: 1, lastPage: 1, limit: 3, total: 3 },
+					},
+					'Comments fetched successfully',
+				),
 			},
 			'400': {
 				description:
 					'Happens when there is an invalid field sent from the client.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(400),
-					message: Joi.string().example('Page is invalid or missing'),
-					error: Joi.string().example('Bad Request'),
-				}),
+				schema: badRequestApiResponse('Page is invalid or missing'),
 			},
 			'404': {
 				description: 'Happens when the post id is not found.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					message: Joi.string().example('This post is not found!'),
-					error: Joi.string().example('Not Found'),
-				}),
+				schema: notFoundApiResponse('This post is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 2,
 		produces: ['application/json'],
@@ -112,37 +74,20 @@ export const commentSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the comment data from the given comment id.',
-				schema: Joi.object<ApiResponse<{ comment: Comment }>, true>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Comment fetched successfully'),
-					data: Joi.object({
-						comment: commentValidator.example(createFakeCommentExample()),
-					}),
-				}),
+				schema: apiResponse<{ comment: Comment }>(
+					{ comment: createFakeCommentExample() },
+					'Comment fetched successfully',
+				),
 			},
 			'400': {
 				description: 'Happens when the comment id is invalid.',
-				schema: Joi.object<ErrorApiResponse, true>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('"id" must be a valid GUID'),
-				}),
+				schema: badRequestApiResponse('"id" must be a valid GUID'),
 			},
 			'404': {
 				description: 'Happens when the given comment cannot be found.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					message: Joi.string().example('This comment is not found!'),
-					error: Joi.string().example('Not Found'),
-				}),
+				schema: notFoundApiResponse('This comment is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 3,
 		produces: ['application/json'],
@@ -153,38 +98,21 @@ export const commentSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the new edited comment.',
-				schema: Joi.object<ApiResponse<{ comment: Comment }>, true>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Comment updated successfully'),
-					data: Joi.object({
-						comment: commentValidator.example(createFakeCommentExample()),
-					}),
-				}),
+				schema: apiResponse<{ comment: Comment }>(
+					{ comment: createFakeCommentExample() },
+					'Comment updated successfully',
+				),
 			},
 			'400': {
 				description:
 					'Happens when the comment id or any other fields are invalid.',
-				schema: Joi.object<ErrorApiResponse, true>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('"id" must be a valid GUID'),
-				}),
+				schema: badRequestApiResponse('"id" must be a valid GUID'),
 			},
 			'404': {
 				description: 'Happens when the given comment cannot be found.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					message: Joi.string().example('This comment is not found!'),
-					error: Joi.string().example('Not Found'),
-				}),
+				schema: notFoundApiResponse('This comment is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
 		produces: ['application/json'],
@@ -195,38 +123,21 @@ export const commentSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the id of the deleted comment .',
-				schema: Joi.object<ApiResponse<{ commentId: UUID }>, true>({
-					statusCode: Joi.number().example(200),
-					message: Joi.string().example('Comment deleted successfully'),
-					data: Joi.object({
-						commentId: Joi.string().example(faker.string.uuid()),
-					}),
-				}),
+				schema: apiResponse<{ commentId: UUID }>(
+					{ commentId: crypto.randomUUID() },
+					'Comment deleted successfully',
+				),
 			},
 			'400': {
 				description:
 					'Happens when the comment id or any other fields are invalid.',
-				schema: Joi.object<ErrorApiResponse, true>({
-					statusCode: Joi.number().example(400),
-					error: Joi.string().example('Bad Request'),
-					message: Joi.string().example('"id" must be a valid GUID'),
-				}),
+				schema: badRequestApiResponse('"id" must be a valid GUID'),
 			},
 			'404': {
 				description: 'Happens when the given comment cannot be found.',
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(404),
-					message: Joi.string().example('This comment is not found!'),
-					error: Joi.string().example('Not Found'),
-				}),
+				schema: notFoundApiResponse('This comment is not found!'),
 			},
-			'500': {
-				schema: Joi.object<ErrorApiResponse>({
-					statusCode: Joi.number().example(500),
-					message: Joi.string().example('An internal server error occurred'),
-					error: Joi.string().example('Internal Server Error'),
-				}),
-			},
+			'500': { schema: serverErrorApiResponse },
 		},
 		order: 5,
 		produces: ['application/json'],
