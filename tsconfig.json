@@ -19,6 +19,6 @@
 			"src": ["./src"]
 		}
 	},
-	"include": ["./src/**/*", "process-env.d.ts", "vercel.json"],
+	"include": ["./src/**/*", "process-env.d.ts"],
 	"exclude": ["node_modules"]
 }
