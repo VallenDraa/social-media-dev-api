@@ -433,7 +433,7 @@ describe('User e2e', () => {
 			> = [
 				{
 					input: {
-						newPassword: '1232323',
+						newPassword: 'password12345',
 					},
 					expected: {
 						statusCode: 400,
@@ -443,7 +443,7 @@ describe('User e2e', () => {
 				},
 				{
 					input: {
-						oldPassword: '1232323',
+						oldPassword: 'password12345',
 					},
 					expected: {
 						statusCode: 400,
