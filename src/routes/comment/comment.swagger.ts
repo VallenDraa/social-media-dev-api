@@ -1,4 +1,3 @@
-import { type UUID } from 'node:crypto';
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import { type Comment, type MetaData } from 'src/models';
 import { emptyArray } from 'src/utils/array-utils';
@@ -10,6 +9,7 @@ import {
 	serverErrorApiResponse,
 } from 'src/validators';
 import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
+import crypto from 'node:crypto';
 
 export const commentSwagger: Record<
 	| 'GET /posts/{postId}/comments'
@@ -123,7 +123,7 @@ export const commentSwagger: Record<
 		responses: {
 			'200': {
 				description: 'Returns the id of the deleted comment .',
-				schema: apiResponse<{ commentId: UUID }>(
+				schema: apiResponse<{ commentId: crypto.UUID }>(
 					{ commentId: crypto.randomUUID() },
 					'Comment deleted successfully',
 				),

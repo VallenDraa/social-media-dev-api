@@ -9,6 +9,7 @@ import {
 	serverErrorApiResponse,
 	unauthorizedApiResponse,
 } from 'src/validators';
+import crypto from 'node:crypto';
 
 export const authSwagger: Record<
 	| 'POST /auth/register'

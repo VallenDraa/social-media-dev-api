@@ -1,4 +1,4 @@
-import { type UUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import { type PostEdit, type Post, type PostCreate } from 'src/models';
 import { postRepository, userRepository } from 'src/repositories';
 import { dataStore } from 'src/store';
@@ -6,7 +6,7 @@ import { paginateService } from './pagination.service';
 import Boom from '@hapi/boom';
 
 export const postService = {
-	addPost(owner: UUID, newPostData: PostCreate) {
+	addPost(owner: crypto.UUID, newPostData: PostCreate) {
 		const createdAt = new Date().toISOString();
 
 		const newPost: Post = {
@@ -48,7 +48,7 @@ export const postService = {
 		return paginateService.paginate(allPosts, limit, page);
 	},
 
-	getUserPosts(userId: UUID, limit = 10, page = 1) {
+	getUserPosts(userId: crypto.UUID, limit = 10, page = 1) {
 		const isUserExist = userRepository.getUserById(dataStore, userId);
 
 		if (!isUserExist) {
@@ -60,7 +60,7 @@ export const postService = {
 		return paginateService.paginate(userPosts, limit, page);
 	},
 
-	getPostById(id: UUID) {
+	getPostById(id: crypto.UUID) {
 		const post = postRepository.getPostById(dataStore, id);
 
 		if (!post) {
@@ -75,7 +75,7 @@ export const postService = {
 		return postDetail;
 	},
 
-	updatePost(id: UUID, updatedPostData: PostEdit) {
+	updatePost(id: crypto.UUID, updatedPostData: PostEdit) {
 		const post = this.getPostById(id);
 
 		if (!post) {
@@ -115,7 +115,7 @@ export const postService = {
 		return updatedPost;
 	},
 
-	deletePost(id: UUID) {
+	deletePost(id: crypto.UUID) {
 		const isDeleted = postRepository.deletePost(dataStore, id);
 
 		if (!isDeleted) {

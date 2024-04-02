@@ -9,6 +9,7 @@ import {
 	notFoundApiResponse,
 } from 'src/validators';
 import { serverErrorApiResponse } from 'src/validators';
+import crypto from 'node:crypto';
 
 export const postsSwagger: Record<
 	| 'GET /posts'

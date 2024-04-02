@@ -1,5 +1,5 @@
 import { dataStore } from 'src/store';
-import { type UUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import Boom from '@hapi/boom';
 import { userService } from './user.service';
 import {
@@ -74,7 +74,7 @@ export const authService = {
 		}
 	},
 
-	me(id: UUID) {
+	me(id: crypto.UUID) {
 		if (!id) {
 			throw Boom.badRequest('User ID is required');
 		}

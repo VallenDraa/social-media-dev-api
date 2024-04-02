@@ -15,6 +15,7 @@ import { createServer } from 'src/server';
 import request from 'supertest';
 import { registerDataMock } from 'src/__tests__/mocks';
 import { type TestCase } from '../types';
+import crypto from 'node:crypto';
 
 describe('Comments e2e', () => {
 	let server: Server;

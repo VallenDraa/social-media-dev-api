@@ -7,7 +7,7 @@ import {
 import { dataStore } from 'src/store';
 import { userRepository } from 'src/repositories';
 import Boom from '@hapi/boom';
-import { type UUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import { paginateService } from './pagination.service';
 
 export const userService = {
@@ -38,7 +38,7 @@ export const userService = {
 		return paginateService.paginate(users, limit, page);
 	},
 
-	getUserById(id: UUID) {
+	getUserById(id: crypto.UUID) {
 		const user = userRepository.getUserById(dataStore, id);
 
 		if (!user) {
@@ -48,7 +48,7 @@ export const userService = {
 		return user;
 	},
 
-	updateUser(id: UUID, updatedUserData: UserEdit) {
+	updateUser(id: crypto.UUID, updatedUserData: UserEdit) {
 		const user = this.getUserById(id);
 
 		const updatedUser: UserWithoutPassword = {
@@ -66,7 +66,11 @@ export const userService = {
 		return updatedUser;
 	},
 
-	updateUserPassword(id: UUID, oldPassword: string, newPassword: string) {
+	updateUserPassword(
+		id: crypto.UUID,
+		oldPassword: string,
+		newPassword: string,
+	) {
 		const user = userRepository.getUserWithPassword(dataStore, id);
 
 		if (!user) {
@@ -96,7 +100,7 @@ export const userService = {
 		return id;
 	},
 
-	deleteUser(id: UUID) {
+	deleteUser(id: crypto.UUID) {
 		const isDeleted = userRepository.deleteUser(dataStore, id);
 
 		if (!isDeleted) {

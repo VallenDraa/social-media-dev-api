@@ -14,6 +14,7 @@ import {
 } from 'src/models';
 import { registerDataMock } from 'src/__tests__/mocks';
 import { type TestCase } from '../types';
+import crypto from 'node:crypto';
 
 describe('Posts e2e', () => {
 	let server: Server;

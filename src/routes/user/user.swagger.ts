@@ -14,6 +14,7 @@ import {
 	notFoundApiResponse,
 	serverErrorApiResponse,
 } from 'src/validators';
+import crypto from 'node:crypto';
 
 export const usersSwagger: Record<
 	| 'POST /users'

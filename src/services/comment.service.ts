@@ -1,4 +1,4 @@
-import { type UUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import { type CommentEdit, type CommentCreate, type Comment } from 'src/models';
 import {
 	commentRepository,
@@ -10,7 +10,7 @@ import Boom from '@hapi/boom';
 import { paginateService } from './pagination.service';
 
 export const commentService = {
-	addComment(postId: UUID, newCommentData: CommentCreate) {
+	addComment(postId: crypto.UUID, newCommentData: CommentCreate) {
 		const post = postRepository.getPostById(dataStore, postId);
 
 		if (!post) {
@@ -34,7 +34,7 @@ export const commentService = {
 		return newComment;
 	},
 
-	getCommentsOfPost(postId: UUID, limit = 10, page = 1) {
+	getCommentsOfPost(postId: crypto.UUID, limit = 10, page = 1) {
 		const allComments = commentRepository.getCommentsOfPost(dataStore, postId);
 
 		if (!allComments) {
@@ -44,7 +44,7 @@ export const commentService = {
 		return paginateService.paginate(allComments, limit, page);
 	},
 
-	getCommentById(id: UUID) {
+	getCommentById(id: crypto.UUID) {
 		const comment = commentRepository.getCommentById(dataStore, id);
 
 		if (!comment) {
@@ -54,7 +54,7 @@ export const commentService = {
 		return comment;
 	},
 
-	updateComment(id: UUID, updatedCommentData: CommentEdit) {
+	updateComment(id: crypto.UUID, updatedCommentData: CommentEdit) {
 		const comment = this.getCommentById(id);
 
 		const updatedComment: Comment = {
@@ -93,7 +93,7 @@ export const commentService = {
 		return updatedComment;
 	},
 
-	deleteComment(id: UUID) {
+	deleteComment(id: crypto.UUID) {
 		const isDeleted = commentRepository.deleteComment(dataStore, id);
 
 		if (!isDeleted) {
