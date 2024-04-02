@@ -4,7 +4,7 @@ import {
 	type Post,
 	type UserWithoutPassword,
 } from 'src/models';
-import { type UUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import { faker } from '@faker-js/faker';
 import { emptyArray } from './array-utils';
 
@@ -49,9 +49,9 @@ export const createFakePost = ({
 	likes,
 	dislikes,
 }: {
-	ownerId: UUID;
-	likes: UUID[];
-	dislikes: UUID[];
+	ownerId: crypto.UUID;
+	likes: crypto.UUID[];
+	dislikes: crypto.UUID[];
 }): Post => ({
 	id: crypto.randomUUID(),
 	description: faker.lorem.paragraph(),
@@ -79,11 +79,11 @@ export const createFakeComment = ({
 	dislikes,
 	replies,
 }: {
-	postId: UUID;
-	ownerId: UUID;
-	likes: UUID[];
-	dislikes: UUID[];
-	replies: UUID[];
+	postId: crypto.UUID;
+	ownerId: crypto.UUID;
+	likes: crypto.UUID[];
+	dislikes: crypto.UUID[];
+	replies: crypto.UUID[];
 }): Comment => ({
 	id: crypto.randomUUID(),
 	content: faker.lorem.paragraph(),
@@ -120,14 +120,14 @@ export const createFakePostExample = (): Post => ({
 	images: [...Array<string>(faker.number.int({ min: 1, max: 5 }))].map(() =>
 		faker.image.urlLoremFlickr(),
 	),
-	owner: faker.string.uuid() as UUID,
+	owner: faker.string.uuid() as crypto.UUID,
 	likes: emptyArray(
 		faker.number.int({ min: 0, max: 3 }),
-		() => faker.string.uuid() as UUID,
+		() => faker.string.uuid() as crypto.UUID,
 	),
 	dislikes: emptyArray(
 		faker.number.int({ min: 0, max: 3 }),
-		() => faker.string.uuid() as UUID,
+		() => faker.string.uuid() as crypto.UUID,
 	),
 	createdAt: faker.date
 		.recent({ days: 30, refDate: new Date('2022-01-01') })
@@ -145,17 +145,17 @@ export const createFakeCommentExample = (): Comment => ({
 	content: faker.lorem.paragraph(),
 	likes: emptyArray(
 		faker.number.int({ min: 0, max: 3 }),
-		() => faker.string.uuid() as UUID,
+		() => faker.string.uuid() as crypto.UUID,
 	),
 	dislikes: emptyArray(
 		faker.number.int({ min: 0, max: 3 }),
-		() => faker.string.uuid() as UUID,
+		() => faker.string.uuid() as crypto.UUID,
 	),
-	post: faker.string.uuid() as UUID,
-	owner: faker.string.uuid() as UUID,
+	post: faker.string.uuid() as crypto.UUID,
+	owner: faker.string.uuid() as crypto.UUID,
 	replies: emptyArray(
 		faker.number.int({ min: 0, max: 3 }),
-		() => faker.string.uuid() as UUID,
+		() => faker.string.uuid() as crypto.UUID,
 	),
 	createdAt: faker.date
 		.recent({ days: 30, refDate: new Date('2022-01-01') })
