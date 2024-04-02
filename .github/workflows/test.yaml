@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: []
 
+env:
+  ACCESS_TOKEN_SECRET: fake_access_secret
+  REFRESH_TOKEN_SECRET: fake_refresh_secret
+
 jobs:
   test-project:
     runs-on: ubuntu-22.04
