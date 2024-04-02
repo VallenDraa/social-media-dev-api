@@ -1,4 +1,4 @@
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import { type Comment, type MetaData } from 'src/models';
 import { emptyArray } from 'src/utils/array-utils';

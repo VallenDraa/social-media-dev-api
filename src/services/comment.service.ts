@@ -1,4 +1,4 @@
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { type CommentEdit, type CommentCreate, type Comment } from 'src/models';
 import {
 	commentRepository,

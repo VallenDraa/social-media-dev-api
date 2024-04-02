@@ -1,5 +1,5 @@
 import { type Request, type ResponseToolkit } from '@hapi/hapi';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import {
 	type MetaData,
 	type ApiResponse,

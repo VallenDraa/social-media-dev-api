@@ -1,5 +1,5 @@
 import { type Login, type UserWithoutPassword, type User } from 'src/models';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { type DataStore } from 'src/store';
 
 export const authRepository = {

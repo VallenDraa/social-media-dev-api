@@ -1,5 +1,5 @@
 import { dataStore } from 'src/store';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import Boom from '@hapi/boom';
 import { userService } from './user.service';
 import {

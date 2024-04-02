@@ -1,7 +1,7 @@
 import { type Request, type ResponseToolkit } from '@hapi/hapi';
 import { type Comment, type CommentEdit, type CommentCreate } from 'src/models';
 import { type MetaData, type ApiResponse } from 'src/models/response.model';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { commentService } from 'src/services';
 
 export const commentController = {

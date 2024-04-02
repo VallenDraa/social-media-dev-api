@@ -1,4 +1,4 @@
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { type User, type Post, type Comment } from 'src/models';
 import { type DataStore, dataStore } from '.';
 import {

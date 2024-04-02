@@ -4,7 +4,7 @@ import {
 	type Post,
 	type UserWithoutPassword,
 } from 'src/models';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { faker } from '@faker-js/faker';
 import { emptyArray } from './array-utils';
 

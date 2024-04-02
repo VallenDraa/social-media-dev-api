@@ -2,7 +2,7 @@ import type hapiAuthJwt2 from 'hapi-auth-jwt2';
 import jwt from 'jsonwebtoken';
 import { type AccessToken } from 'src/models';
 import { type DataStore } from 'src/store';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 
 export const createAccessToken = (
 	userId: UUID,

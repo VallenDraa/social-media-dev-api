@@ -7,7 +7,7 @@ import {
 } from 'src/models';
 import { postService } from 'src/services';
 import { type MetaData, type ApiResponse } from 'src/models/response.model';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 
 export const postController = {
 	addPost(req: Request, h: ResponseToolkit) {

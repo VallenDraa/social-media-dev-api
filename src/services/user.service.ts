@@ -7,7 +7,7 @@ import {
 import { dataStore } from 'src/store';
 import { userRepository } from 'src/repositories';
 import Boom from '@hapi/boom';
-import { type UUID } from 'crypto';
+import { type UUID } from 'node:crypto';
 import { paginateService } from './pagination.service';
 
 export const userService = {
