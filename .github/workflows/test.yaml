@@ -1,17 +1,19 @@
 name: Test the project
 
-on:
-  push:
-  pull_request:
-    branches: []
-
-env:
-  ACCESS_TOKEN_SECRET: fake_access_secret
-  REFRESH_TOKEN_SECRET: fake_refresh_secret
+on: [push, pull_request]
 
 jobs:
   test-project:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+
+    env:
+      PORT: 3000
+      HOST: '127.0.0.1'
+      FAKE_USER_AMOUNT: 100
+      FAKE_POST_AMOUNT: 200
+      FAKE_COMMENT_AMOUNT: 400
+      ACCESS_TOKEN_SECRET: fake_access_secret
+      REFRESH_TOKEN_SECRET: fake_access_secret
 
     steps:
       - uses: actions/checkout@v4
