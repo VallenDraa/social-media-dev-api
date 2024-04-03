@@ -10,14 +10,18 @@ import { createServer } from 'src/server';
 import jwt from 'jsonwebtoken';
 import { registerDataMock } from 'src/__tests__/mocks';
 import type TestAgent from 'supertest/lib/agent';
+import { type Server } from '@hapi/hapi';
 
 describe('Auth e2e', () => {
 	let agent: TestAgent;
+	let serverListener: Server['listener'];
 
 	beforeAll(async () => {
-		const serverListener = (await createServer(true)).listener;
+		serverListener = (await createServer(true)).listener.listen();
 		agent = request(serverListener);
 	});
+
+	afterAll(() => serverListener.close());
 
 	describe('POST /auth/register', () => {
 		const sendRegisterData = (data: object, status: number) =>

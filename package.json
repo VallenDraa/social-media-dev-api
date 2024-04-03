@@ -11,8 +11,8 @@
 		"test": "jest --watch",
 		"test:unit": "jest --watch --testPathPattern=src/__tests__/unit",
 		"test:e2e": "jest --watch --testPathPattern=src/__tests__/e2e",
-		"test:unit:ci": "jest --runInBand --testPathPattern=src/__tests__/unit",
-		"test:e2e:ci": "jest --runInBand --testPathPattern=src/__tests__/e2e",
+		"test:unit:ci": "jest --ci --testPathPattern=src/__tests__/unit",
+		"test:e2e:ci": "jest --ci --testPathPattern=src/__tests__/e2e",
 		"test:coverage": "jest --coverage",
 		"lint": "tsc -noEmit && eslint ."
 	},

@@ -16,9 +16,11 @@ import { registerDataMock } from 'src/__tests__/mocks';
 import { type TestCase } from '../types';
 import crypto from 'node:crypto';
 import type TestAgent from 'supertest/lib/agent';
+import { type Server } from '@hapi/hapi';
 
 describe('Comments e2e', () => {
 	let agent: TestAgent;
+	let serverListener: Server['listener'];
 	let accessToken: string;
 	let fakeUser: UserWithoutPassword;
 	const OLD_ENV = process.env;
@@ -31,7 +33,7 @@ describe('Comments e2e', () => {
 			FAKE_USER_AMOUNT: '10',
 		};
 
-		const serverListener = (await createServer(true)).listener;
+		serverListener = (await createServer(true)).listener.listen();
 		agent = request(serverListener);
 
 		// Register fake user
@@ -58,6 +60,8 @@ describe('Comments e2e', () => {
 					(res.body as ApiResponse<{ user: UserWithoutPassword }>).data.user,
 			);
 	});
+
+	afterAll(() => serverListener.close())
 
 	const getPost = async () =>
 		agent
