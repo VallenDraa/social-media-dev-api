@@ -1,5 +1,4 @@
 import request from 'supertest';
-import { type Server } from '@hapi/hapi';
 import {
 	type MetaData,
 	type User,
@@ -15,9 +14,10 @@ import { createServer } from 'src/server';
 import { registerDataMock } from 'src/__tests__/mocks';
 import { type TestCase } from 'src/__tests__/types';
 import crypto from 'node:crypto';
+import type TestAgent from 'supertest/lib/agent';
 
 describe('User e2e', () => {
-	let server: Server;
+	let agent: TestAgent;
 	let accessToken: string;
 	let fakeUser: UserWithoutPassword;
 	const OLD_ENV = process.env;
@@ -30,15 +30,14 @@ describe('User e2e', () => {
 			FAKE_USER_AMOUNT: '10',
 		};
 
-		server = await createServer(true);
+		const serverListener = (await createServer(true)).listener;
+		agent = request(serverListener);
 
 		// Register fake user
-		await request(server.listener)
-			.post('/auth/register')
-			.send(registerDataMock);
+		await agent.post('/auth/register').send(registerDataMock);
 
 		// Get accesss token of fake user
-		accessToken = await request(server.listener)
+		accessToken = await agent
 			.post('/auth/login')
 			.send({
 				email: registerDataMock.email,
@@ -50,7 +49,7 @@ describe('User e2e', () => {
 			);
 
 		// Get fake user detail
-		fakeUser = await request(server.listener)
+		fakeUser = await agent
 			.get('/auth/me')
 			.set('Authorization', `Bearer ${accessToken}`)
 			.then(
@@ -70,7 +69,7 @@ describe('User e2e', () => {
 			query.set('limit', limit.toString());
 		}
 
-		return request(server.listener)
+		return agent
 			.get(`/users?${query.toString()}`)
 			.set('Authorization', `Bearer ${accessToken}`);
 	};
@@ -148,7 +147,7 @@ describe('User e2e', () => {
 
 	describe('POST /users', () => {
 		const addUser = (newUser: Partial<UserCreate>) =>
-			request(server.listener)
+			agent
 				.post('/users')
 				.send(newUser)
 				.set('Authorization', `Bearer ${accessToken}`);
@@ -240,12 +239,10 @@ describe('User e2e', () => {
 
 	describe('GET /users/:id', () => {
 		const getUserById = (id: string) =>
-			request(server.listener)
-				.get(`/users/${id}`)
-				.set('Authorization', `Bearer ${accessToken}`);
+			agent.get(`/users/${id}`).set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should return user when found', async () => {
-			const validUserId = await request(server.listener)
+			const validUserId = await agent
 				.get('/users')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)
@@ -280,7 +277,7 @@ describe('User e2e', () => {
 
 	describe('PUT /users/:id', () => {
 		const updateUser = (userId: string, user: Partial<UserEdit>) =>
-			request(server.listener)
+			agent
 				.put(`/users/${userId}`)
 				.send(user)
 				.set('Authorization', `Bearer ${accessToken}`);
@@ -378,7 +375,7 @@ describe('User e2e', () => {
 			userId: string,
 			data: Partial<UpdateUserPassword>,
 		) =>
-			request(server.listener)
+			agent
 				.put(`/users/${userId}/password`)
 				.set('Authorization', `Bearer ${accessToken}`)
 				.send(data);
@@ -484,7 +481,7 @@ describe('User e2e', () => {
 
 	describe('DELETE /users/:id', () => {
 		const deleteUserById = (id: string) =>
-			request(server.listener)
+			agent
 				.delete(`/users/${id}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 

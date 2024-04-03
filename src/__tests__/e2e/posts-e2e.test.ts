@@ -1,5 +1,4 @@
 import request from 'supertest';
-import { type Server } from '@hapi/hapi';
 import { createServer } from 'src/server';
 import {
 	type MetaData,
@@ -15,9 +14,10 @@ import {
 import { registerDataMock } from 'src/__tests__/mocks';
 import { type TestCase } from '../types';
 import crypto from 'node:crypto';
+import type TestAgent from 'supertest/lib/agent';
 
 describe('Posts e2e', () => {
-	let server: Server;
+	let agent: TestAgent;
 	let accessToken: string;
 	let fakeUser: UserWithoutPassword;
 	const OLD_ENV = process.env;
@@ -30,15 +30,14 @@ describe('Posts e2e', () => {
 			FAKE_USER_AMOUNT: '10',
 		};
 
-		server = await createServer(true);
+		const serverListener = (await createServer(true)).listener;
+		agent = request(serverListener);
 
 		// Register fake user
-		await request(server.listener)
-			.post('/auth/register')
-			.send(registerDataMock);
+		await agent.post('/auth/register').send(registerDataMock);
 
 		// Get accesss token of fake user
-		accessToken = await request(server.listener)
+		accessToken = await agent
 			.post('/auth/login')
 			.send({
 				email: registerDataMock.email,
@@ -50,7 +49,7 @@ describe('Posts e2e', () => {
 			);
 
 		// Get fake user detail
-		fakeUser = await request(server.listener)
+		fakeUser = await agent
 			.get('/auth/me')
 			.set('Authorization', `Bearer ${accessToken}`)
 			.then(
@@ -89,7 +88,7 @@ describe('Posts e2e', () => {
 				query.set('with-top-comments', 'true');
 			}
 
-			return request(server.listener)
+			return agent
 				.get(`/posts?${query.toString()}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 		};
@@ -220,7 +219,7 @@ describe('Posts e2e', () => {
 
 	describe('POST /posts', () => {
 		const addPost = (owner: string, newPost: Partial<PostCreate>) =>
-			request(server.listener)
+			agent
 				.post(`/users/${owner}/posts`)
 				.send(newPost)
 				.set('Authorization', `Bearer ${accessToken}`);
@@ -319,7 +318,7 @@ describe('Posts e2e', () => {
 				query.set('limit', limit.toString());
 			}
 
-			return request(server.listener)
+			return agent
 				.get(`/users/${userId}/posts?${query.toString()}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 		};
@@ -413,12 +412,10 @@ describe('Posts e2e', () => {
 
 	describe('GET /posts/:id', () => {
 		const getPostById = (id: string) =>
-			request(server.listener)
-				.get(`/posts/${id}`)
-				.set('Authorization', `Bearer ${accessToken}`);
+			agent.get(`/posts/${id}`).set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should return post when found', async () => {
-			const validPostId = await request(server.listener)
+			const validPostId = await agent
 				.get('/posts')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)
@@ -453,13 +450,13 @@ describe('Posts e2e', () => {
 
 	describe('PUT /posts/:id', () => {
 		const updatePost = (postId: string, post: Partial<PostEdit>) =>
-			request(server.listener)
+			agent
 				.put(`/posts/${postId}`)
 				.send(post)
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		const getValidPost = async () =>
-			request(server.listener)
+			agent
 				.get('/posts')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)
@@ -610,12 +607,12 @@ describe('Posts e2e', () => {
 
 	describe('DELETE /posts/:id', () => {
 		const deletePostById = (id: string) =>
-			request(server.listener)
+			agent
 				.delete(`/posts/${id}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should delete post when found', async () => {
-			const validPostId = await request(server.listener)
+			const validPostId = await agent
 				.get('/posts')
 				.set('Authorization', `Bearer ${accessToken}`)
 				.expect(200)

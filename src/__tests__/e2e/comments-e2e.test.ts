@@ -1,4 +1,3 @@
-import { type Server } from '@hapi/hapi';
 import {
 	type Post,
 	type ApiResponse,
@@ -16,9 +15,10 @@ import request from 'supertest';
 import { registerDataMock } from 'src/__tests__/mocks';
 import { type TestCase } from '../types';
 import crypto from 'node:crypto';
+import type TestAgent from 'supertest/lib/agent';
 
 describe('Comments e2e', () => {
-	let server: Server;
+	let agent: TestAgent;
 	let accessToken: string;
 	let fakeUser: UserWithoutPassword;
 	const OLD_ENV = process.env;
@@ -31,15 +31,14 @@ describe('Comments e2e', () => {
 			FAKE_USER_AMOUNT: '10',
 		};
 
-		server = await createServer(true);
+		const serverListener = (await createServer(true)).listener;
+		agent = request(serverListener);
 
 		// Register fake user
-		await request(server.listener)
-			.post('/auth/register')
-			.send(registerDataMock);
+		await agent.post('/auth/register').send(registerDataMock);
 
 		// Get accesss token of fake user
-		accessToken = await request(server.listener)
+		accessToken = await agent
 			.post('/auth/login')
 			.send({
 				email: registerDataMock.email,
@@ -51,7 +50,7 @@ describe('Comments e2e', () => {
 			);
 
 		// Get fake user detail
-		fakeUser = await request(server.listener)
+		fakeUser = await agent
 			.get('/auth/me')
 			.set('Authorization', `Bearer ${accessToken}`)
 			.then(
@@ -61,7 +60,7 @@ describe('Comments e2e', () => {
 	});
 
 	const getPost = async () =>
-		request(server.listener)
+		agent
 			.get('/posts?has-comments=true&with-top-comments=true')
 			.set('Authorization', `Bearer ${accessToken}`)
 			.then(
@@ -84,7 +83,7 @@ describe('Comments e2e', () => {
 				query.append('limit', limit.toString());
 			}
 
-			return request(server.listener)
+			return agent
 				.get(`/posts/${postId}/comments?${query.toString()}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 		};
@@ -166,7 +165,7 @@ describe('Comments e2e', () => {
 
 	describe('GET /comments/:id', () => {
 		const getComment = (commentId: string) =>
-			request(server.listener)
+			agent
 				.get(`/comments/${commentId}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 
@@ -214,7 +213,7 @@ describe('Comments e2e', () => {
 
 	describe('POST /comments', () => {
 		const addComment = (postId: string, payload: Partial<CommentCreate>) =>
-			request(server.listener)
+			agent
 				.post(`/posts/${postId}/comments`)
 				.set('Authorization', `Bearer ${accessToken}`)
 				.send(payload);
@@ -305,7 +304,7 @@ describe('Comments e2e', () => {
 
 	describe('PUT /comments/:id', () => {
 		const editComment = (commentId: string, payload: Partial<CommentEdit>) =>
-			request(server.listener)
+			agent
 				.put(`/comments/${commentId}`)
 				.set('Authorization', `Bearer ${accessToken}`)
 				.send(payload);
@@ -468,7 +467,7 @@ describe('Comments e2e', () => {
 
 	describe('DELETE /comments/:id', () => {
 		const deleteComment = (commentId: string) =>
-			request(server.listener)
+			agent
 				.delete(`/comments/${commentId}`)
 				.set('Authorization', `Bearer ${accessToken}`);
 
