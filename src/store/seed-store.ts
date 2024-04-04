@@ -5,6 +5,7 @@ import {
 	createFakeComment,
 	createFakeUser,
 	createFakePost,
+	createFakeFriendsList,
 } from 'src/utils/fake-data';
 import {
 	emptyArray,
@@ -41,6 +42,10 @@ export const seedStore = (
 ) => {
 	store.setState(state => {
 		const users = emptyArray<User>(userAmount).map(() => createFakeUser());
+		const usersId = users.map(user => user.id);
+		const friendsList = users.map(user =>
+			createFakeFriendsList({ user, friendsPool: usersId }),
+		);
 
 		const posts = emptyArray<Post>(postAmount).map(() =>
 			createFakePost({
@@ -96,7 +101,7 @@ export const seedStore = (
 			comments.push(fakeComment, ...fakeCommentReplies);
 		}
 
-		return { ...state, users, posts, comments };
+		return { ...state, users, posts, comments, friendsList };
 	});
 };
 

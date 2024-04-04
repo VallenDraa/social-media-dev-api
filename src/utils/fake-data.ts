@@ -3,10 +3,11 @@ import {
 	type Comment,
 	type Post,
 	type UserWithoutPassword,
+	type FriendsList,
 } from 'src/models';
 import crypto from 'node:crypto';
 import { faker } from '@faker-js/faker';
-import { emptyArray } from './array-utils';
+import { emptyArray, getRandomsFromArray } from './array-utils';
 
 /**
  * @returns Fake user without password for real API response
@@ -95,6 +96,26 @@ export const createFakeComment = ({
 	createdAt: faker.date
 		.recent({ days: 30, refDate: new Date('2022-01-01') })
 		.toISOString(),
+	updatedAt: faker.date
+		.recent({ days: 30, refDate: new Date('2023-01-01') })
+		.toISOString(),
+});
+
+export const createFakeFriendsList = ({
+	user,
+	friendsPool,
+}: {
+	user: User | UserWithoutPassword;
+	friendsPool: crypto.UUID[];
+}): FriendsList => ({
+	userId: user.id,
+	list: getRandomsFromArray(friendsPool).map(userId => ({
+		id: userId,
+		friendsSince: faker.date
+			.recent({ days: 60, refDate: new Date('2022-06-01') })
+			.toISOString(),
+	})),
+	createdAt: user.createdAt,
 	updatedAt: faker.date
 		.recent({ days: 30, refDate: new Date('2023-01-01') })
 		.toISOString(),

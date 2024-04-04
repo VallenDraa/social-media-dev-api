@@ -1,14 +1,22 @@
-import { type Store, type Post, type Comment, type User } from 'src/models';
+import {
+	type Store,
+	type Post,
+	type Comment,
+	type User,
+	type FriendsList,
+} from 'src/models';
 
 export const dataStore: Store<{
 	users: User[];
 	comments: Comment[];
 	posts: Post[];
+	friendsList: FriendsList[];
 }> = {
 	state: {
 		comments: [],
 		posts: [],
 		users: [],
+		friendsList: [],
 	},
 
 	getState() {
@@ -21,9 +29,10 @@ export const dataStore: Store<{
 
 	resetStore() {
 		this.state = {
-			users: [],
 			comments: [],
 			posts: [],
+			users: [],
+			friendsList: [],
 		};
 	},
 };
