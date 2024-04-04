@@ -83,7 +83,7 @@ describe('User e2e', () => {
 			.data.users[0];
 
 	describe('GET /users', () => {
-		it('Should return first page with 10 users when no query is not provided', async () => {
+		it('Should return first page with 10 users when no query is provided', async () => {
 			await getUsers()
 				.expect(200)
 				.then(res => {

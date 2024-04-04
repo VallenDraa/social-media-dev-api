@@ -97,7 +97,7 @@ describe('Posts e2e', () => {
 				.set('Authorization', `Bearer ${accessToken}`);
 		};
 
-		it('Should return first page with 10 posts when no query is not provided', async () => {
+		it('Should return first page with 10 posts when no query is provided', async () => {
 			await getPosts({})
 				.expect(200)
 				.then(res => {
