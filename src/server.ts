@@ -11,8 +11,8 @@ export const createServer = async (isTest: boolean) => {
 	seedStoreInit();
 
 	if (!isTest) {
-		const fiveMinutes = 300_000;
-		refreshStore(fiveMinutes);
+		const thirtyMinutes = 1_800_000;
+		refreshStore(thirtyMinutes);
 	}
 
 	const server = Hapi.server({
