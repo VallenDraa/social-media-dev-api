@@ -5,8 +5,9 @@ import {
 	idValidator,
 	paginateValidator,
 	postIdValidator,
+	createCommentValidator,
+	editCommentValidator,
 } from 'src/validators';
-import { createCommentValidator, editCommentValidator } from 'src/validators/';
 import { commentSwagger } from './comment.swagger';
 
 export const commentRoutes: ServerRoute[] = [

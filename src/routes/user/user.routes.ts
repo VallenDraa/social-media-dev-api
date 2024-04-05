@@ -1,8 +1,9 @@
 import { type ServerRoute } from '@hapi/hapi';
 import { userController } from 'src/controllers';
 import { failAction } from 'src/utils/fail-action-response';
-import { idValidator, paginateValidator } from 'src/validators';
 import {
+	idValidator,
+	paginateValidator,
 	createUserValidator,
 	editUserPasswordValidator,
 	editUserValidator,
