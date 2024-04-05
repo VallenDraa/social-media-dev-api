@@ -1,4 +1,4 @@
-import { type UUID } from 'node:crypto';
+import crypto from 'node:crypto';
 import { type User, type Post, type Comment } from 'src/models';
 import { type DataStore, dataStore } from '.';
 import {
@@ -42,6 +42,20 @@ export const seedStore = (
 ) => {
 	store.setState(state => {
 		const users = emptyArray<User>(userAmount).map(() => createFakeUser());
+
+		// Add default user for manual testing in development
+		if (process.env.NODE_ENV === 'development') {
+			users.push({
+				id: crypto.randomUUID(),
+				username: 'admin',
+				email: 'admin@admin.com',
+				password: 'password1234567890',
+				profilePicture: faker.image.avatar(),
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			});
+		}
+
 		const usersId = users.map(user => user.id);
 		const friendsList = users.map(user =>
 			createFakeFriendsList({ user, friendsPool: usersId }),
@@ -60,14 +74,15 @@ export const seedStore = (
 			const postId = getRandomFromArray(posts).id;
 
 			// We make the fake replies and then push it to the new fake comment
-			const fakeCommentReplies = emptyArray<UUID>(randInt(1, 5)).map(() =>
-				createFakeComment({
-					ownerId: getRandomFromArray(users).id,
-					postId,
-					replies: [],
-					dislikes: getRandomsFromArray(users.map(user => user.id)),
-					likes: getRandomsFromArray(users.map(user => user.id)),
-				}),
+			const fakeCommentReplies = emptyArray<crypto.UUID>(randInt(1, 5)).map(
+				() =>
+					createFakeComment({
+						ownerId: getRandomFromArray(users).id,
+						postId,
+						replies: [],
+						dislikes: getRandomsFromArray(users.map(user => user.id)),
+						likes: getRandomsFromArray(users.map(user => user.id)),
+					}),
 			);
 
 			const chosenRepliesIdx: number[] = [];
@@ -79,7 +94,7 @@ export const seedStore = (
 			const fakeComment = createFakeComment({
 				ownerId: getRandomFromArray(users).id,
 				postId,
-				replies: emptyArray<UUID>(repliesAmount).map(() => {
+				replies: emptyArray<crypto.UUID>(repliesAmount).map(() => {
 					const maxRepliesAmount = fakeCommentReplies.length - 1;
 					let idx = randInt(0, maxRepliesAmount);
 

@@ -8,6 +8,7 @@ describe('seedStore', () => {
 
 		process.env = {
 			...OLD_ENV,
+			NODE_ENV: "test",
 			FAKE_COMMENT_AMOUNT: '10',
 			FAKE_POST_AMOUNT: '10',
 			FAKE_USER_AMOUNT: '10',
