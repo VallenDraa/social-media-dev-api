@@ -33,10 +33,16 @@ describe('Auth e2e', () => {
 
 		it('Should register new user and return 201 status code', async () => {
 			await sendRegisterData(registerDataMock, 201).then(response => {
-				const body = response.body as ApiResponse<null>;
-				expect(body.data).toBeNull();
+				const body = response.body as ApiResponse<{
+					user: UserWithoutPassword;
+				}>;
+
 				expect(body.message).toStrictEqual('Registration successful');
 				expect(body.statusCode).toStrictEqual(201);
+				expect(body.data.user.email).toStrictEqual(registerDataMock.email);
+				expect(body.data.user.username).toStrictEqual(
+					registerDataMock.username,
+				);
 			});
 		});
 

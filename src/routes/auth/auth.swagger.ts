@@ -1,7 +1,10 @@
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import { SWAGGER_SECURITY_DEFINITION } from 'src/constants';
 import { type UserWithoutPassword } from 'src/models';
-import { createFakeUserExample } from 'src/utils/fake-data';
+import {
+	createFakeUserExample,
+	createFakeUserWithoutPasswordExample,
+} from 'src/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
@@ -22,7 +25,11 @@ export const authSwagger: Record<
 		responses: {
 			'201': {
 				description: 'Returns success status.',
-				schema: apiResponse<null>(null, 'Registration successful', 201),
+				schema: apiResponse<UserWithoutPassword>(
+					createFakeUserWithoutPasswordExample(),
+					'Registration successful',
+					201,
+				),
 			},
 			'400': {
 				description: 'Can be because of invalid credentials or duplicate user.',

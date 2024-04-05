@@ -6,9 +6,10 @@ import {
 	type RegisterData,
 	type Login,
 	type AccessToken,
-} from 'src/models/auth.model';
-import { type User } from 'src/models';
-import { authRepository } from 'src/repositories/auth.repository';
+	type User,
+	type UserWithoutPassword,
+} from 'src/models';
+import { authRepository } from 'src/repositories';
 import {
 	createAccessToken,
 	createRefreshToken,
@@ -30,7 +31,7 @@ export const authService = {
 		return { accessToken, refreshToken };
 	},
 
-	register(registerData: RegisterData) {
+	register(registerData: RegisterData): UserWithoutPassword {
 		if (registerData.password !== registerData.confirmPassword) {
 			throw Boom.badRequest('Password and confirm password do not match');
 		}
@@ -53,6 +54,9 @@ export const authService = {
 		if (!isRegistered) {
 			throw Boom.badRequest('User already exists');
 		}
+
+		const { password, ...userWithoutPassword } = newUser;
+		return userWithoutPassword;
 	},
 
 	refreshToken(refreshToken: string) {

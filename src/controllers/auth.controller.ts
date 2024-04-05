@@ -7,7 +7,7 @@ import {
 	type RegisterData,
 	type RefreshTokenPayload,
 } from 'src/models';
-import { authService } from 'src/services/auth.service';
+import { authService } from 'src/services';
 
 export const authController = {
 	login(request: Request, h: ResponseToolkit) {
@@ -27,11 +27,11 @@ export const authController = {
 	register(request: Request, h: ResponseToolkit) {
 		const registerData = request.payload as RegisterData;
 
-		authService.register(registerData);
-		const response: ApiResponse<null> = {
+		const newUser = authService.register(registerData);
+		const response: ApiResponse<{ user: UserWithoutPassword }> = {
 			statusCode: 201,
 			message: 'Registration successful',
-			data: null,
+			data: { user: newUser },
 		};
 
 		return h.response(response).code(201);

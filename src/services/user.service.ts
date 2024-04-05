@@ -5,7 +5,7 @@ import {
 	type UserWithoutPassword,
 } from 'src/models';
 import { dataStore } from 'src/store';
-import { userRepository } from 'src/repositories';
+import { friendRepository, userRepository } from 'src/repositories';
 import Boom from '@hapi/boom';
 import crypto from 'node:crypto';
 import { paginateService } from './pagination.service';
@@ -26,6 +26,8 @@ export const userService = {
 		if (!isAdded) {
 			throw Boom.conflict('The username of email of this user already exists!');
 		}
+
+		friendRepository.createFriendsList(dataStore, newUser);
 
 		const { password, ...userWithoutPassword } = newUser;
 
