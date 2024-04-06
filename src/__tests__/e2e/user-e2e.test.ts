@@ -516,6 +516,27 @@ describe('User e2e', () => {
 					expect(body.message).toStrictEqual('User deleted successfully');
 					expect(body.data.userId).toStrictEqual(validUser.id);
 				});
+
+			// Check if every reference of the user is deleted
+			const { comments, friendsList, posts } = dataStore.getState();
+
+			expect(
+				comments.every(comment => comment.owner !== validUser.id),
+			).toStrictEqual(true);
+
+			expect(posts.every(post => post.owner !== validUser.id)).toStrictEqual(
+				true,
+			);
+
+			expect(
+				friendsList.every(entry => entry.userId !== validUser.id),
+			).toStrictEqual(true);
+
+			expect(
+				friendsList.every(entry =>
+					entry.list.every(friend => friend.id !== validUser.id),
+				),
+			).toStrictEqual(true);
 		});
 
 		it('Should return 404 when user is not found', async () => {

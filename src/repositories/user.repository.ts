@@ -101,6 +101,16 @@ export const userRepository = {
 
 				return true;
 			}),
+			friendsList: state.friendsList
+				// Remove the friendsList that belongs to the deleted user
+				.filter(entry => entry.userId !== id)
+				// Remove the deleted user from all friendsList that referenced this user
+				.map(entry => ({
+					...entry,
+					list: entry.list.filter(friend => friend.id !== id),
+				})),
+			comments: state.comments.filter(comment => comment.owner !== id),
+			posts: state.posts.filter(post => post.owner !== id),
 		}));
 
 		return isDeleted;
