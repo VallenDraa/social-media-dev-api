@@ -33,6 +33,7 @@ export const swaggerPlugin = async (server: Server) => {
 			},
 		},
 		OAS: 'v3.0',
+		swaggerUIPath: '/',
 		uiOptions: { defaultModelsExpandDepth: -1, layout: 'BaseLayout' },
 		schemes: process.env.NODE_ENV === 'production' ? ['https'] : ['http'],
 	};
