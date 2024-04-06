@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
+import { type UUID } from 'node:crypto';
 import { type User, type Post, type Comment } from 'src/models';
 import { type DataStore, dataStore } from '.';
 import {
@@ -46,7 +46,7 @@ export const seedStore = (
 		// Add default user for manual testing in development
 		if (process.env.NODE_ENV === 'development') {
 			users.push({
-				id: crypto.randomUUID(),
+				id: '5d46479a-c622-4450-8345-9c8aa5344ac5',
 				username: 'admin',
 				email: 'admin@admin.com',
 				password: 'password1234567890',
@@ -74,15 +74,14 @@ export const seedStore = (
 			const postId = getRandomFromArray(posts).id;
 
 			// We make the fake replies and then push it to the new fake comment
-			const fakeCommentReplies = emptyArray<crypto.UUID>(randInt(1, 5)).map(
-				() =>
-					createFakeComment({
-						ownerId: getRandomFromArray(users).id,
-						postId,
-						replies: [],
-						dislikes: getRandomsFromArray(users.map(user => user.id)),
-						likes: getRandomsFromArray(users.map(user => user.id)),
-					}),
+			const fakeCommentReplies = emptyArray<UUID>(randInt(1, 5)).map(() =>
+				createFakeComment({
+					ownerId: getRandomFromArray(users).id,
+					postId,
+					replies: [],
+					dislikes: getRandomsFromArray(users.map(user => user.id)),
+					likes: getRandomsFromArray(users.map(user => user.id)),
+				}),
 			);
 
 			const chosenRepliesIdx: number[] = [];
@@ -94,7 +93,7 @@ export const seedStore = (
 			const fakeComment = createFakeComment({
 				ownerId: getRandomFromArray(users).id,
 				postId,
-				replies: emptyArray<crypto.UUID>(repliesAmount).map(() => {
+				replies: emptyArray<UUID>(repliesAmount).map(() => {
 					const maxRepliesAmount = fakeCommentReplies.length - 1;
 					let idx = randInt(0, maxRepliesAmount);
 
