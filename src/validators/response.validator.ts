@@ -41,3 +41,8 @@ export const notFoundApiResponse = (message: string) =>
 	errorApiResponseValidator
 		.example({ statusCode: 404, error: 'Not Found', message })
 		.label('NotFoundApiResponse');
+
+export const conflictApiResponse = (message: string) =>
+	errorApiResponseValidator
+		.example({ statusCode: 409, error: 'Conflict', message })
+		.label('ConflictApiResponse');

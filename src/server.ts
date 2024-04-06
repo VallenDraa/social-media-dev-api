@@ -2,7 +2,13 @@ import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
 import { swaggerPlugin, loggerPlugin, authPlugin } from 'src/plugins';
 import { seedStoreInit, dataStore, refreshStore } from 'src/store';
-import { authRoutes, commentRoutes, postRoutes, userRoutes } from './routes';
+import {
+	authRoutes,
+	friendRoutes,
+	commentRoutes,
+	postRoutes,
+	userRoutes,
+} from './routes';
 
 export const createServer = async (isTest: boolean) => {
 	dotenv.config();
@@ -32,7 +38,13 @@ export const createServer = async (isTest: boolean) => {
 
 	await authPlugin(server, dataStore);
 
-	server.route([...userRoutes, ...postRoutes, ...commentRoutes, ...authRoutes]);
+	server.route([
+		...userRoutes,
+		...friendRoutes,
+		...postRoutes,
+		...commentRoutes,
+		...authRoutes,
+	]);
 
 	return server;
 };

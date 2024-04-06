@@ -9,7 +9,7 @@ import {
 	type User,
 	type UserWithoutPassword,
 } from 'src/models';
-import { authRepository } from 'src/repositories';
+import { authRepository, friendRepository } from 'src/repositories';
 import {
 	createAccessToken,
 	createRefreshToken,
@@ -54,6 +54,8 @@ export const authService = {
 		if (!isRegistered) {
 			throw Boom.badRequest('User already exists');
 		}
+
+		friendRepository.createFriendsList(dataStore, newUser);
 
 		const { password, ...userWithoutPassword } = newUser;
 		return userWithoutPassword;

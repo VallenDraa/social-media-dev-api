@@ -16,6 +16,7 @@ import { type TestCase } from 'src/__tests__/types';
 import crypto from 'node:crypto';
 import type TestAgent from 'supertest/lib/agent';
 import { type Server } from '@hapi/hapi';
+import { dataStore } from 'src/store';
 
 describe('User e2e', () => {
 	let agent: TestAgent;
@@ -156,7 +157,7 @@ describe('User e2e', () => {
 				.send(newUser)
 				.set('Authorization', `Bearer ${accessToken}`);
 
-		it('Should return 201 when user is created successfully', async () => {
+		it('Should return 201 and create a new friendsList when user is created successfully', async () => {
 			const newUser: UserCreate = {
 				email: 'dude@gmail.com',
 				profilePicture: 'https://image.com/image.jpg',
@@ -164,14 +165,28 @@ describe('User e2e', () => {
 				password: 'password12345',
 			};
 
-			await addUser(newUser)
-				.expect(201)
-				.then(res => {
-					const body = res.body as ApiResponse<{ user: User }>;
+			const result = await addUser(newUser).expect(201);
+			const userResponse = result.body as ApiResponse<{
+				user: UserWithoutPassword;
+			}>;
 
-					expect(body.statusCode).toStrictEqual(201);
-					expect(body.message).toStrictEqual('User created successfully');
-				});
+			expect(userResponse.statusCode).toStrictEqual(201);
+			expect(userResponse.message).toStrictEqual('User created successfully');
+
+			const { friendsList } = dataStore.getState();
+			const userFriendsList = friendsList.find(
+				entry => entry.userId === userResponse.data.user.id,
+			);
+
+			// Check if friendsList is created
+			expect(userFriendsList).toBeDefined();
+			expect(userFriendsList!.createdAt).toStrictEqual(
+				userResponse.data.user.createdAt,
+			);
+			expect(userFriendsList!.updatedAt).toStrictEqual(
+				userResponse.data.user.createdAt,
+			);
+			expect(userFriendsList!.list.length).toStrictEqual(0);
 		});
 
 		it('Should return 400 when there are missing fields', async () => {

@@ -11,6 +11,7 @@ import jwt from 'jsonwebtoken';
 import { registerDataMock } from 'src/__tests__/mocks';
 import type TestAgent from 'supertest/lib/agent';
 import { type Server } from '@hapi/hapi';
+import { dataStore } from 'src/store';
 
 describe('Auth e2e', () => {
 	let agent: TestAgent;
@@ -31,7 +32,7 @@ describe('Auth e2e', () => {
 				.expect(status)
 				.expect('Content-Type', /json/);
 
-		it('Should register new user and return 201 status code', async () => {
+		it('Should register new user, creates new user friendsList, and return 201 status code', async () => {
 			await sendRegisterData(registerDataMock, 201).then(response => {
 				const body = response.body as ApiResponse<{
 					user: UserWithoutPassword;
@@ -44,6 +45,18 @@ describe('Auth e2e', () => {
 					registerDataMock.username,
 				);
 			});
+
+			const { friendsList, users } = dataStore.getState();
+			const user = users.find(entry => entry.email === registerDataMock.email)!;
+			const userFriendsList = friendsList.find(
+				entry => entry.userId === user.id,
+			);
+
+			// Check if friendsList is created
+			expect(userFriendsList).toBeDefined();
+			expect(userFriendsList!.createdAt).toStrictEqual(user.createdAt);
+			expect(userFriendsList!.updatedAt).toStrictEqual(user.createdAt);
+			expect(userFriendsList!.list.length).toStrictEqual(0);
 		});
 
 		it('Should return 400 status code when there is a duplicate user in the database', async () => {
@@ -160,7 +173,7 @@ describe('Auth e2e', () => {
 				.expect(status)
 				.expect('Content-Type', /json/);
 
-		it('Should give access token and refresh token when user login successfully', async () => {
+		it('Should give access token and refresh token when user login successfully, ', async () => {
 			await sendLoginData(loginData, 200).then(response => {
 				const body = response.body as ApiResponse<{
 					accessToken: string;

@@ -101,6 +101,9 @@ export const createFakeComment = ({
 		.toISOString(),
 });
 
+/**
+ * @returns Fake friends list for real API response
+ */
 export const createFakeFriendsList = ({
 	user,
 	friendsPool,
@@ -180,6 +183,27 @@ export const createFakeCommentExample = (): Comment => ({
 	),
 	createdAt: faker.date
 		.recent({ days: 30, refDate: new Date('2022-01-01') })
+		.toISOString(),
+	updatedAt: faker.date
+		.recent({ days: 30, refDate: new Date('2023-01-01') })
+		.toISOString(),
+});
+
+/**
+ * @returns Fake friends list for swagger example response
+ */
+export const createFakeFriendsListExample = (): FriendsList => ({
+	userId: crypto.randomUUID(),
+	list: getRandomsFromArray(emptyArray(30, crypto.randomUUID))
+		.map(userId => ({
+			id: userId,
+			friendsSince: faker.date
+				.recent({ days: 60, refDate: new Date('2022-06-01') })
+				.toISOString(),
+		}))
+		.slice(0, 3),
+	createdAt: faker.date
+		.recent({ days: 60, refDate: new Date('2021-06-01') })
 		.toISOString(),
 	updatedAt: faker.date
 		.recent({ days: 30, refDate: new Date('2023-01-01') })
