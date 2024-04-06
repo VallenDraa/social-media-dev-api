@@ -6,7 +6,6 @@
 		"sourceMap": false,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-
 		"removeComments": true,
 		"module": "commonjs",
 		"alwaysStrict": true,

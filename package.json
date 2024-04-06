@@ -1,7 +1,7 @@
 {
 	"name": "mock-development-api",
 	"version": "1.0.0",
-	"description": "",
+	"description": "Use this API for playing with frontend features that needs a mock REST API",
 	"main": "index.js",
 	"packageManager": "pnpm@8.15.5",
 	"scripts": {
@@ -9,10 +9,10 @@
 		"build": "rimraf dist && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
 		"start": "node dist/src/index.js",
 		"test": "jest --watch",
-		"test:unit": "jest --watch --testPathPattern=src/__tests__/unit",
-		"test:e2e": "jest --watch --testPathPattern=src/__tests__/e2e",
-		"test:unit:ci": "jest --ci --testPathPattern=src/__tests__/unit",
-		"test:e2e:ci": "jest --ci --testPathPattern=src/__tests__/e2e",
+		"test:unit:v1": "jest --watch --testPathPattern=src/v1/__tests__/unit",
+		"test:e2e:v1": "jest --watch --testPathPattern=src/v1/__tests__/e2e",
+		"test:unit:v1:ci": "jest --ci --testPathPattern=src/v1/__tests__/unit",
+		"test:e2e:v1:ci": "jest --ci --testPathPattern=src/v1/__tests__/e2e",
 		"test:coverage": "jest --coverage",
 		"lint": "tsc -noEmit && eslint ."
 	},

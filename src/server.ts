@@ -1,19 +1,9 @@
 import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
-import { swaggerPlugin, loggerPlugin, authPlugin } from 'src/plugins';
-import { seedStoreInit, dataStore, refreshStore } from 'src/store';
-import { authRoutes, commentRoutes, postRoutes, userRoutes } from './routes';
+import { v1Init } from './v1/v1-init';
 
 export const createServer = async (isTest: boolean) => {
 	dotenv.config();
-
-	// Setup the store and reset it every 5 minutes
-	seedStoreInit();
-
-	if (!isTest) {
-		const fiveMinutes = 300_000;
-		refreshStore(fiveMinutes);
-	}
 
 	const server = Hapi.server({
 		port: process.env.PORT,
@@ -25,14 +15,14 @@ export const createServer = async (isTest: boolean) => {
 		},
 	});
 
-	if (!isTest) {
-		await swaggerPlugin(server);
-		await loggerPlugin(server);
-	}
+	await v1Init(server, isTest);
 
-	await authPlugin(server, dataStore);
-
-	server.route([...userRoutes, ...postRoutes, ...commentRoutes, ...authRoutes]);
+	server.route({
+		path: '/',
+		method: 'GET',
+		options: { auth: false },
+		handler: (_req, h) => h.redirect('/api/v1'),
+	});
 
 	return server;
 };

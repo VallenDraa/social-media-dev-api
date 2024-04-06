@@ -40,8 +40,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Unit test the project
-        run: pnpm test:unit:ci
+      - name: V1 unit test the project
+        run: pnpm test:unit:v1:ci
 
-      - name: E2E test the project
-        run: pnpm test:e2e:ci
+      - name: V1 E2E test the project
+        run: pnpm test:e2e:v1:ci
