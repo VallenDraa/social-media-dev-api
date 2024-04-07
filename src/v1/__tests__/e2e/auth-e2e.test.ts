@@ -12,6 +12,7 @@ import { registerDataMock } from 'src/v1/__tests__/mocks';
 import type TestAgent from 'supertest/lib/agent';
 import { type Server } from '@hapi/hapi';
 import { dataStore } from 'src/v1/store';
+import { REFRESH_TOKEN_COOKIE_NAME } from 'src/v1/utils/jwt';
 
 describe('Auth e2e', () => {
 	let agent: TestAgent;
@@ -23,6 +24,11 @@ describe('Auth e2e', () => {
 	});
 
 	afterAll(() => serverListener.close());
+
+	const getRefreshTokenCookie = (response: request.Response) =>
+		(response.header['set-cookie'] as unknown as string[])
+			.find(cookie => cookie.startsWith(REFRESH_TOKEN_COOKIE_NAME))
+			?.split(';')[0];
 
 	describe('POST /auth/register', () => {
 		const sendRegisterData = (data: object, status: number) =>
@@ -180,8 +186,11 @@ describe('Auth e2e', () => {
 					refreshToken: string;
 				}>;
 
+				const refreshToken = getRefreshTokenCookie(response);
+
 				expect(body.statusCode).toStrictEqual(200);
 				expect(body.message).toStrictEqual('Login successful');
+				expect(typeof refreshToken).toStrictEqual('string');
 				expect(typeof body.data.accessToken).toStrictEqual('string');
 				expect(typeof body.data.refreshToken).toStrictEqual('string');
 			});
@@ -317,10 +326,16 @@ describe('Auth e2e', () => {
 						refreshToken: string;
 					}>;
 
-					return body.data;
+					const refreshTokenCookie = getRefreshTokenCookie(response);
+
+					return {
+						accessToken: body.data.accessToken,
+						refreshToken: body.data.refreshToken,
+						refreshTokenCookie,
+					};
 				});
 
-		it("Should return 401 status code if 'refreshToken' is invalid or expired", async () => {
+		it("Should return 401 status code if 'refreshToken' from payload is invalid or expired", async () => {
 			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
 			const expiredRefreshToken = jwt.sign(
 				{},
@@ -341,7 +356,7 @@ describe('Auth e2e', () => {
 				});
 		});
 
-		it("Should return new access token if 'refreshToken' is valid", async () => {
+		it("Should return new access token if 'refreshToken' from payload is valid", async () => {
 			const refreshToken = await getTokens().then(
 				tokens => tokens.refreshToken,
 			);
@@ -358,6 +373,84 @@ describe('Auth e2e', () => {
 						'Successfully refreshed access token',
 					);
 					expect(typeof body.data.accessToken).toStrictEqual('string');
+				});
+		});
+
+		it("Should return 401 status code if 'refreshToken' from cookie is invalid or expired", async () => {
+			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
+			const expiredRefreshToken = jwt.sign(
+				{},
+				process.env.REFRESH_TOKEN_SECRET,
+				{ subject: userId, expiresIn: '0s' },
+			);
+
+			await agent
+				.post('/api/v1/auth/refresh-token')
+				.send({})
+				.set('Cookie', [`${REFRESH_TOKEN_COOKIE_NAME}=${expiredRefreshToken}`])
+				.expect(401)
+				.then(response => {
+					const body = response.body as ErrorApiResponse;
+
+					expect(body.error).toStrictEqual('Unauthorized');
+					expect(body.message).toStrictEqual('Refresh token expired');
+					expect(body.statusCode).toStrictEqual(401);
+				});
+		});
+
+		it("Should return new access token if 'refreshToken' from cookie is valid", async () => {
+			const refreshTokenCookie = await getTokens().then(
+				tokens => tokens.refreshTokenCookie,
+			);
+
+			await agent
+				.post('/api/v1/auth/refresh-token')
+				.set('Cookie', [refreshTokenCookie!])
+				.send({})
+				.expect(200)
+				.then(response => {
+					const body = response.body as ApiResponse<{ accessToken: string }>;
+
+					expect(body.statusCode).toStrictEqual(200);
+					expect(body.message).toStrictEqual(
+						'Successfully refreshed access token',
+					);
+					expect(typeof body.data.accessToken).toStrictEqual('string');
+				});
+		});
+
+		it("Should throw error when both payload and cookie 'refreshToken' are sent", async () => {
+			const tokens = await getTokens();
+
+			await agent
+				.post('/api/v1/auth/refresh-token')
+				.set('Cookie', [tokens.refreshTokenCookie!])
+				.send({ refreshToken: tokens.refreshToken })
+				.expect(403)
+				.then(response => {
+					const body = response.body as ErrorApiResponse;
+
+					expect(body.message).toStrictEqual(
+						'Cannot send both payload and cookie refresh token',
+					);
+					expect(body.statusCode).toStrictEqual(403);
+					expect(body.error).toStrictEqual('Forbidden');
+				});
+		});
+
+		it("Should throw error when both payload and cookie 'refreshToken' are not sent", async () => {
+			await agent
+				.post('/api/v1/auth/refresh-token')
+				.send({})
+				.expect(400)
+				.then(response => {
+					const body = response.body as ErrorApiResponse;
+
+					expect(body.message).toStrictEqual(
+						'Refresh token must be sent either via cookie or payload!',
+					);
+					expect(body.statusCode).toStrictEqual(400);
+					expect(body.error).toStrictEqual('Bad Request');
 				});
 		});
 	});
