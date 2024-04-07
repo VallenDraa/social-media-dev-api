@@ -8,6 +8,10 @@ import {
 	type RefreshTokenPayload,
 } from 'src/v1/models';
 import { authService } from 'src/v1/services';
+import {
+	REFRESH_TOKEN_COOKIE_NAME,
+	REFRESH_TOKEN_COOKIE_OPTIONS,
+} from '../utils/jwt';
 
 export const authController = {
 	login(request: Request, h: ResponseToolkit) {
@@ -21,25 +25,52 @@ export const authController = {
 				data: { accessToken, refreshToken },
 			};
 
-		return h.response(response);
+		return (
+			h
+				.response(response)
+				// Set refresh token cookie
+				.state(
+					REFRESH_TOKEN_COOKIE_NAME,
+					refreshToken,
+					REFRESH_TOKEN_COOKIE_OPTIONS,
+				)
+		);
+	},
+
+	logout(_request: Request, h: ResponseToolkit) {
+		const response: ApiResponse<null> = {
+			statusCode: 200,
+			message: 'Logout successful',
+			data: null,
+		};
+
+		return h.response(response).unstate(REFRESH_TOKEN_COOKIE_NAME);
 	},
 
 	register(request: Request, h: ResponseToolkit) {
 		const registerData = request.payload as RegisterData;
 
-		const newUser = authService.register(registerData);
-		const response: ApiResponse<{ user: UserWithoutPassword }> = {
+		authService.register(registerData);
+		const response: ApiResponse<null> = {
 			statusCode: 201,
 			message: 'Registration successful',
-			data: { user: newUser },
+			data: null,
 		};
 
 		return h.response(response).code(201);
 	},
 
 	refreshToken(request: Request, h: ResponseToolkit) {
-		const { refreshToken } = request.payload as RefreshTokenPayload;
-		const newAccessToken = authService.refreshToken(refreshToken);
+		const payloadRefreshToken = (request.payload as RefreshTokenPayload)
+			?.refreshToken as string | undefined;
+		const cookieRefreshToken = (request.state as { refreshToken?: string })?.[
+			REFRESH_TOKEN_COOKIE_NAME
+		];
+
+		const newAccessToken = authService.refreshToken({
+			cookieRefreshToken,
+			payloadRefreshToken,
+		});
 
 		const response: ApiResponse<{ accessToken: string }> = {
 			statusCode: 200,

@@ -44,6 +44,19 @@ export const authRoutes: ServerRoute[] = [
 		handler: authController.login,
 	},
 	{
+		path: '/auth/logout',
+		method: 'GET',
+		options: {
+			auth: false,
+			description: 'Logout',
+			notes: 'Used for clearing refresh token that is stored in the cookies.',
+			tags: ['api', 'auth'],
+			plugins: { 'hapi-swagger': authSwagger['GET /auth/logout'] },
+			validate: { failAction, state: refreshTokenValidator },
+		},
+		handler: authController.logout,
+	},
+	{
 		path: '/auth/me',
 		method: 'GET',
 		options: {
@@ -65,11 +78,13 @@ export const authRoutes: ServerRoute[] = [
 		options: {
 			auth: false,
 			description: 'Refresh Token',
-			notes: 'Send a refresh token here to get new access token.',
+			notes:
+				'Send a refresh token to get new access token. You can send it via the request body or cookies (obtained through login endpoint).',
 			tags: ['api', 'auth'],
 			plugins: { 'hapi-swagger': authSwagger['POST /auth/refresh-token'] },
 			validate: {
 				failAction,
+				state: refreshTokenValidator,
 				payload: refreshTokenValidator,
 			},
 		},

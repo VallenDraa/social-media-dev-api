@@ -7,7 +7,6 @@ import {
 	type Login,
 	type AccessToken,
 	type User,
-	type UserWithoutPassword,
 } from 'src/v1/models';
 import { authRepository, friendRepository } from 'src/v1/repositories';
 import {
@@ -25,13 +24,15 @@ export const authService = {
 			throw Boom.unauthorized('Invalid email or password');
 		}
 
-		const accessToken = createAccessToken(user.id, {});
-		const refreshToken = createRefreshToken(user.id, {});
+		const accessToken = createAccessToken({ userId: user.id });
+		const refreshToken = createRefreshToken({
+			userId: user.id,
+		});
 
 		return { accessToken, refreshToken };
 	},
 
-	register(registerData: RegisterData): UserWithoutPassword {
+	register(registerData: RegisterData) {
 		if (registerData.password !== registerData.confirmPassword) {
 			throw Boom.badRequest('Password and confirm password do not match');
 		}
@@ -56,19 +57,35 @@ export const authService = {
 		}
 
 		friendRepository.createFriendsList(dataStore, newUser);
-
-		const { password, ...userWithoutPassword } = newUser;
-		return userWithoutPassword;
 	},
 
-	refreshToken(refreshToken: string) {
+	refreshToken({
+		cookieRefreshToken,
+		payloadRefreshToken,
+	}: {
+		payloadRefreshToken?: string;
+		cookieRefreshToken?: string;
+	}) {
+		if (!payloadRefreshToken && !cookieRefreshToken) {
+			throw Boom.badRequest(
+				'Refresh token must be sent either via cookie or payload!',
+			);
+		}
+
+		if (payloadRefreshToken && cookieRefreshToken) {
+			throw Boom.forbidden('Cannot send both payload and cookie refresh token');
+		}
+
+		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+		const refreshToken = payloadRefreshToken || cookieRefreshToken;
+
 		if (!refreshToken) {
 			throw Boom.badRequest('Refresh token is required');
 		}
 
 		try {
 			const decoded = validateRefreshToken(refreshToken) as AccessToken;
-			const newAccessToken = createAccessToken(decoded.sub, {});
+			const newAccessToken = createAccessToken({ userId: decoded.sub });
 
 			return newAccessToken;
 		} catch (error) {

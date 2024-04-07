@@ -5,8 +5,8 @@ module.exports = {
 	setupFiles: ['dotenv/config'],
 	roots: ['<rootDir>/src'],
 	modulePathIgnorePatterns: [
-		'<rootDir>/src/__tests__/types',
-		'<rootDir>/src/__tests__/mocks',
+		'<rootDir>/src/v1/__tests__/types',
+		'<rootDir>/src/v1/__tests__/mocks',
 	],
 	moduleNameMapper: {
 		'^src/(.*)$': ['<rootDir>/src/$1'],

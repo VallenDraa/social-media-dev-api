@@ -1,12 +1,10 @@
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import { type UserWithoutPassword } from 'src/v1/models';
-import {
-	createFakeUserExample,
-	createFakeUserWithoutPasswordExample,
-} from 'src/v1/utils/fake-data';
+import { createFakeUserExample } from 'src/v1/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
+	forbiddenApiResponse,
 	notFoundApiResponse,
 	serverErrorApiResponse,
 	unauthorizedApiResponse,
@@ -17,6 +15,7 @@ import { SWAGGER_SECURITY_DEFINITION } from 'src/v1/plugins';
 export const authSwagger: Record<
 	| 'POST /auth/register'
 	| 'POST /auth/login'
+	| 'GET /auth/logout'
 	| 'GET /auth/me'
 	| 'POST /auth/refresh-token',
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
@@ -25,11 +24,7 @@ export const authSwagger: Record<
 		responses: {
 			'201': {
 				description: 'Returns success status.',
-				schema: apiResponse<UserWithoutPassword>(
-					createFakeUserWithoutPasswordExample(),
-					'Registration successful',
-					201,
-				),
+				schema: apiResponse<null>(null, 'Registration successful', 201),
 			},
 			'400': {
 				description: 'Can be because of invalid credentials or duplicate user.',
@@ -46,7 +41,8 @@ export const authSwagger: Record<
 	'POST /auth/login': {
 		responses: {
 			'200': {
-				description: 'Returns status code with access token and refresh token.',
+				description:
+					'Returns status code with access token and refresh token. The access token will be sent via cookie and response body.',
 				schema: apiResponse<{ accessToken: string; refreshToken: string }>(
 					{
 						accessToken: crypto.randomUUID(),
@@ -116,9 +112,28 @@ export const authSwagger: Record<
 				description: 'Happens when refresh token is expired.',
 				schema: unauthorizedApiResponse('Refresh token expired'),
 			},
+			'403': {
+				description:
+					'Happens when refresh token is sent both via cookie and request payload.',
+				schema: forbiddenApiResponse(
+					'Cannot send both payload and cookie refresh token',
+				),
+			},
 			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
+		produces: ['application/json'],
+		payloadType: 'json',
+	},
+	'GET /auth/logout': {
+		responses: {
+			'200': {
+				description: 'Returns successful message.',
+				schema: apiResponse<null>(null, 'Logout successful'),
+			},
+			'500': { schema: serverErrorApiResponse },
+		},
+		order: 5,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},

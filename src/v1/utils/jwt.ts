@@ -3,25 +3,40 @@ import jwt from 'jsonwebtoken';
 import { type AccessToken } from 'src/v1/models';
 import { type DataStore } from 'src/v1/store';
 import { type UUID } from 'node:crypto';
+import { type ServerStateCookieOptions } from '@hapi/hapi';
 
-export const createAccessToken = (
-	userId: UUID,
-	payload: string | Record<string, unknown> | Uint8Array,
-	options: jwt.SignOptions = {},
-) =>
+export type TokenCreationOptions = {
+	userId: UUID;
+	payload?: string | Record<string, unknown> | Uint8Array;
+	options?: jwt.SignOptions;
+};
+
+export const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
+export const REFRESH_TOKEN_COOKIE_OPTIONS: ServerStateCookieOptions = {
+	isSameSite: 'None',
+	isSecure: process.env.NODE_ENV === 'production',
+	ttl: 60 * 60 * 24 * 30 * 1000, // 1 month
+	isHttpOnly: true,
+};
+
+export const createAccessToken = ({
+	userId,
+	payload = {},
+	options = {},
+}: TokenCreationOptions) =>
 	jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
 		expiresIn: '10m',
 		subject: userId,
 		...options,
 	});
 
-export const createRefreshToken = (
-	userId: UUID,
-	payload: string | Record<string, unknown> | Uint8Array,
-	options: jwt.SignOptions = {},
-) =>
+export const createRefreshToken = ({
+	userId,
+	payload = {},
+	options = {},
+}: TokenCreationOptions) =>
 	jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
-		expiresIn: '182d', // 6 months
+		expiresIn: '30d', // 1 month
 		subject: userId,
 		...options,
 	});

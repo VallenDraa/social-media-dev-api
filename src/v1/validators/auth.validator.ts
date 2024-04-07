@@ -49,12 +49,11 @@ export const registerValidator = Joi.object<RegisterData, true>({
 }).label('Register');
 
 export const refreshTokenValidator = Joi.object<RefreshTokenPayload, true>({
-	refreshToken: Joi.string()
-		.trim()
-		.required()
-		.messages({ 'any.required': 'Refresh token is invalid or missing' })
-		.example(crypto.randomUUID()),
-}).label('RefreshToken');
+	refreshToken: Joi.string().trim().optional().example(crypto.randomUUID()),
+})
+	.optional()
+	.unknown(true)
+	.label('RefreshToken');
 
 export const authorizationValidator = Joi.object<AuthorizationPayload, true>({
 	authorization: Joi.string()
