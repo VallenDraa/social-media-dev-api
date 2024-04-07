@@ -46,10 +46,6 @@ describe('Auth e2e', () => {
 
 				expect(body.message).toStrictEqual('Registration successful');
 				expect(body.statusCode).toStrictEqual(201);
-				expect(body.data.user.email).toStrictEqual(registerDataMock.email);
-				expect(body.data.user.username).toStrictEqual(
-					registerDataMock.username,
-				);
 			});
 
 			const { friendsList, users } = dataStore.getState();

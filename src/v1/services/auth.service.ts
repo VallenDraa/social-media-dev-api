@@ -7,7 +7,6 @@ import {
 	type Login,
 	type AccessToken,
 	type User,
-	type UserWithoutPassword,
 } from 'src/v1/models';
 import { authRepository, friendRepository } from 'src/v1/repositories';
 import {
@@ -33,7 +32,7 @@ export const authService = {
 		return { accessToken, refreshToken };
 	},
 
-	register(registerData: RegisterData): UserWithoutPassword {
+	register(registerData: RegisterData) {
 		if (registerData.password !== registerData.confirmPassword) {
 			throw Boom.badRequest('Password and confirm password do not match');
 		}
@@ -58,9 +57,6 @@ export const authService = {
 		}
 
 		friendRepository.createFriendsList(dataStore, newUser);
-
-		const { password, ...userWithoutPassword } = newUser;
-		return userWithoutPassword;
 	},
 
 	refreshToken({

@@ -50,11 +50,11 @@ export const authController = {
 	register(request: Request, h: ResponseToolkit) {
 		const registerData = request.payload as RegisterData;
 
-		const newUser = authService.register(registerData);
-		const response: ApiResponse<{ user: UserWithoutPassword }> = {
+		authService.register(registerData);
+		const response: ApiResponse<null> = {
 			statusCode: 201,
 			message: 'Registration successful',
-			data: { user: newUser },
+			data: null,
 		};
 
 		return h.response(response).code(201);
