@@ -61,16 +61,25 @@ export const authController = {
 	},
 
 	refreshToken(request: Request, h: ResponseToolkit) {
-		const payloadRefreshToken = (request.payload as RefreshTokenPayload)
-			?.refreshToken as string | undefined;
-		const cookieRefreshToken = (request.state as { refreshToken?: string })?.[
+		const { refreshToken } = request.payload as RefreshTokenPayload;
+
+		const newAccessToken = authService.refreshToken(refreshToken);
+
+		const response: ApiResponse<{ accessToken: string }> = {
+			statusCode: 200,
+			message: 'Successfully refreshed access token',
+			data: { accessToken: newAccessToken },
+		};
+
+		return h.response(response);
+	},
+
+	refreshTokenCookie(request: Request, h: ResponseToolkit) {
+		const refreshToken = (request.state as { refreshToken: string })[
 			REFRESH_TOKEN_COOKIE_NAME
 		];
 
-		const newAccessToken = authService.refreshToken({
-			cookieRefreshToken,
-			payloadRefreshToken,
-		});
+		const newAccessToken = authService.refreshToken(refreshToken);
 
 		const response: ApiResponse<{ accessToken: string }> = {
 			statusCode: 200,

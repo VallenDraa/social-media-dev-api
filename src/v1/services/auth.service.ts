@@ -59,26 +59,7 @@ export const authService = {
 		friendRepository.createFriendsList(dataStore, newUser);
 	},
 
-	refreshToken({
-		cookieRefreshToken,
-		payloadRefreshToken,
-	}: {
-		payloadRefreshToken?: string;
-		cookieRefreshToken?: string;
-	}) {
-		if (!payloadRefreshToken && !cookieRefreshToken) {
-			throw Boom.badRequest(
-				'Refresh token must be sent either via cookie or payload!',
-			);
-		}
-
-		if (payloadRefreshToken && cookieRefreshToken) {
-			throw Boom.forbidden('Cannot send both payload and cookie refresh token');
-		}
-
-		// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-		const refreshToken = payloadRefreshToken || cookieRefreshToken;
-
+	refreshToken(refreshToken: string) {
 		if (!refreshToken) {
 			throw Boom.badRequest('Refresh token is required');
 		}
