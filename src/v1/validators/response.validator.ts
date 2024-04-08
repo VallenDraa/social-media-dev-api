@@ -32,11 +32,6 @@ export const unauthorizedApiResponse = (message: string) =>
 		.example({ statusCode: 401, error: 'Unauthorized', message })
 		.label('UnauthorizedApiResponse');
 
-export const forbiddenApiResponse = (message: string) =>
-	errorApiResponseValidator
-		.example({ statusCode: 403, error: 'Forbidden', message })
-		.label('ForbiddenApiResponse');
-
 export const badRequestApiResponse = (message: string) =>
 	errorApiResponseValidator
 		.example({ statusCode: 400, error: 'Bad request', message })

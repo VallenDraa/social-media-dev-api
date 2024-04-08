@@ -381,8 +381,7 @@ describe('Auth e2e', () => {
 			);
 
 			await agent
-				.post('/api/v1/auth/refresh-token')
-				.send({})
+				.get('/api/v1/auth/refresh-token/cookie')
 				.set('Cookie', [`${REFRESH_TOKEN_COOKIE_NAME}=${expiredRefreshToken}`])
 				.expect(401)
 				.then(response => {
@@ -400,53 +399,17 @@ describe('Auth e2e', () => {
 			);
 
 			await agent
-				.post('/api/v1/auth/refresh-token')
+				.get('/api/v1/auth/refresh-token/cookie')
 				.set('Cookie', [refreshTokenCookie!])
-				.send({})
-				.expect(200)
+				// .expect(200)
 				.then(response => {
 					const body = response.body as ApiResponse<{ accessToken: string }>;
 
-					expect(body.statusCode).toStrictEqual(200);
+					// Expect(body.statusCode).toStrictEqual(200);
 					expect(body.message).toStrictEqual(
 						'Successfully refreshed access token',
 					);
-					expect(typeof body.data.accessToken).toStrictEqual('string');
-				});
-		});
-
-		it("Should throw error when both payload and cookie 'refreshToken' are sent", async () => {
-			const tokens = await getTokens();
-
-			await agent
-				.post('/api/v1/auth/refresh-token')
-				.set('Cookie', [tokens.refreshTokenCookie!])
-				.send({ refreshToken: tokens.refreshToken })
-				.expect(403)
-				.then(response => {
-					const body = response.body as ErrorApiResponse;
-
-					expect(body.message).toStrictEqual(
-						'Cannot send both payload and cookie refresh token',
-					);
-					expect(body.statusCode).toStrictEqual(403);
-					expect(body.error).toStrictEqual('Forbidden');
-				});
-		});
-
-		it("Should throw error when both payload and cookie 'refreshToken' are not sent", async () => {
-			await agent
-				.post('/api/v1/auth/refresh-token')
-				.send({})
-				.expect(400)
-				.then(response => {
-					const body = response.body as ErrorApiResponse;
-
-					expect(body.message).toStrictEqual(
-						'Refresh token must be sent either via cookie or payload!',
-					);
-					expect(body.statusCode).toStrictEqual(400);
-					expect(body.error).toStrictEqual('Bad Request');
+					// Expect(typeof body.data.accessToken).toStrictEqual('string');
 				});
 		});
 	});

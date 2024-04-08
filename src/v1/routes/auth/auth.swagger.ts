@@ -4,7 +4,6 @@ import { createFakeUserExample } from 'src/v1/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
-	forbiddenApiResponse,
 	notFoundApiResponse,
 	serverErrorApiResponse,
 	unauthorizedApiResponse,
@@ -17,7 +16,8 @@ export const authSwagger: Record<
 	| 'POST /auth/login'
 	| 'GET /auth/logout'
 	| 'GET /auth/me'
-	| 'POST /auth/refresh-token',
+	| 'POST /auth/refresh-token'
+	| 'GET /auth/refresh-token/cookie',
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
 > = {
 	'POST /auth/register': {
@@ -112,16 +112,32 @@ export const authSwagger: Record<
 				description: 'Happens when refresh token is expired.',
 				schema: unauthorizedApiResponse('Refresh token expired'),
 			},
-			'403': {
-				description:
-					'Happens when refresh token is sent both via cookie and request payload.',
-				schema: forbiddenApiResponse(
-					'Cannot send both payload and cookie refresh token',
-				),
-			},
 			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
+		produces: ['application/json'],
+		payloadType: 'json',
+	},
+	'GET /auth/refresh-token/cookie': {
+		responses: {
+			'200': {
+				description: 'Returns new access token.',
+				schema: apiResponse<{ accessToken: string }>(
+					{ accessToken: crypto.randomUUID() },
+					'Successfully refreshed access token',
+				),
+			},
+			'400': {
+				description: 'Happens when refresh token is missing or invalid.',
+				schema: badRequestApiResponse('Refresh token is required'),
+			},
+			'401': {
+				description: 'Happens when refresh token is expired.',
+				schema: unauthorizedApiResponse('Refresh token expired'),
+			},
+			'500': { schema: serverErrorApiResponse },
+		},
+		order: 5,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
@@ -133,7 +149,7 @@ export const authSwagger: Record<
 			},
 			'500': { schema: serverErrorApiResponse },
 		},
-		order: 5,
+		order: 6,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},

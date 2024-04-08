@@ -49,9 +49,8 @@ export const registerValidator = Joi.object<RegisterData, true>({
 }).label('Register');
 
 export const refreshTokenValidator = Joi.object<RefreshTokenPayload, true>({
-	refreshToken: Joi.string().trim().optional().example(crypto.randomUUID()),
+	refreshToken: Joi.string().trim().required().example(crypto.randomUUID()),
 })
-	.optional()
 	.unknown(true)
 	.label('RefreshToken');
 
