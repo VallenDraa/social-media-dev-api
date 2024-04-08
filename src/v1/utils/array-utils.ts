@@ -8,8 +8,8 @@ export const getRandomsFromArray = <T>(array: T[]): T[] =>
 export const getRandomFromArray = <T>(array: T[]): T =>
 	array[Math.floor(Math.random() * array.length)];
 
-export const emptyArray = <T>(length: number, mapEach?: () => T) => {
+export const emptyArray = <T>(length: number, mapEach?: (i: number) => T) => {
 	const newEmptyArray = [...new Array<T>(length)];
 
-	return mapEach ? newEmptyArray.map(mapEach) : newEmptyArray;
+	return mapEach ? newEmptyArray.map((_, i) => mapEach(i)) : newEmptyArray;
 };

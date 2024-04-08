@@ -194,14 +194,12 @@ export const createFakeCommentExample = (): Comment => ({
  */
 export const createFakeFriendsListExample = (): FriendsList => ({
 	userId: crypto.randomUUID(),
-	list: getRandomsFromArray(emptyArray(30, crypto.randomUUID))
-		.map(userId => ({
-			id: userId,
-			friendsSince: faker.date
-				.recent({ days: 60, refDate: new Date('2022-06-01') })
-				.toISOString(),
-		}))
-		.slice(0, 3),
+	list: emptyArray(3, () => ({
+		id: crypto.randomUUID(),
+		friendsSince: faker.date
+			.recent({ days: 60, refDate: new Date('2022-06-01') })
+			.toISOString(),
+	})),
 	createdAt: faker.date
 		.recent({ days: 60, refDate: new Date('2021-06-01') })
 		.toISOString(),

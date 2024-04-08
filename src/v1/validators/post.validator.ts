@@ -14,7 +14,7 @@ export const createPostValidator = Joi.object<PostCreate, true>({
 		.items(Joi.string().trim().uri())
 		.required()
 		.messages({ 'any.required': 'Images are invalid or missing' })
-		.example(emptyArray(3, faker.image.url)),
+		.example(emptyArray(3, () => faker.image.url())),
 }).label('CreatePost');
 
 export const editPostValidator = Joi.object<PostEdit, true>({
@@ -37,7 +37,7 @@ export const editPostValidator = Joi.object<PostEdit, true>({
 		.items(Joi.string().trim().uri())
 		.required()
 		.messages({ 'any.required': 'Images are invalid or missing' })
-		.example(emptyArray(3, faker.image.url)),
+		.example(emptyArray(3, () => faker.image.url())),
 }).label('EditPost');
 
 export const postValidator = createPostValidator
