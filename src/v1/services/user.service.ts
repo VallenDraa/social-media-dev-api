@@ -21,12 +21,11 @@ export const userService = {
 			updatedAt: createdAt,
 		};
 
-		const isAdded = userRepository.addUser(dataStore, newUser);
-
-		if (!isAdded) {
+		if (userRepository.isUserExists(dataStore, newUser)) {
 			throw Boom.conflict('The username of email of this user already exists!');
 		}
 
+		userRepository.addUser(dataStore, newUser);
 		friendRepository.createFriendsList(dataStore, newUser);
 
 		const { password, ...userWithoutPassword } = newUser;
