@@ -8,7 +8,11 @@ import {
 	type AccessToken,
 	type User,
 } from 'src/v1/models';
-import { authRepository, friendRepository } from 'src/v1/repositories';
+import {
+	authRepository,
+	friendRepository,
+	userRepository,
+} from 'src/v1/repositories';
 import {
 	createAccessToken,
 	createRefreshToken,
@@ -24,17 +28,19 @@ export const authService = {
 			throw Boom.unauthorized('Invalid email or password');
 		}
 
-		const accessToken = createAccessToken({ userId: user.id });
-		const refreshToken = createRefreshToken({
-			userId: user.id,
-		});
-
-		return { accessToken, refreshToken };
+		return {
+			accessToken: createAccessToken({ userId: user.id }),
+			refreshToken: createRefreshToken({ userId: user.id }),
+		};
 	},
 
 	register(registerData: RegisterData) {
 		if (registerData.password !== registerData.confirmPassword) {
 			throw Boom.badRequest('Password and confirm password do not match');
+		}
+
+		if (userRepository.isUserExists(dataStore, registerData)) {
+			throw Boom.badRequest('User already exists');
 		}
 
 		const { confirmPassword, ...dataWithoutConfirmPassword } = registerData;
@@ -50,12 +56,7 @@ export const authService = {
 			updatedAt: createdAt,
 		};
 
-		const isRegistered = authRepository.register(dataStore, newUser);
-
-		if (!isRegistered) {
-			throw Boom.badRequest('User already exists');
-		}
-
+		authRepository.register(dataStore, newUser);
 		friendRepository.createFriendsList(dataStore, newUser);
 	},
 

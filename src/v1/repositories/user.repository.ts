@@ -4,23 +4,7 @@ import { type DataStore } from 'src/v1/store';
 
 export const userRepository = {
 	addUser(store: DataStore, user: User) {
-		let isAdded = false;
-		const { users } = store.getState();
-
-		// Return early if the user already exists
-		if (
-			users.find(u => u.email === user.email || u.username === user.username)
-		) {
-			return isAdded;
-		}
-
-		isAdded = true;
-		store.setState(state => ({
-			...state,
-			users: [user, ...state.users],
-		}));
-
-		return isAdded;
+		store.setState(state => ({ ...state, users: [user, ...state.users] }));
 	},
 
 	getUsers: (store: DataStore) =>
@@ -30,7 +14,7 @@ export const userRepository = {
 			return userWithoutPassword as UserWithoutPassword;
 		}),
 
-	getUserById(store: DataStore, id: UUID) {
+	getUserById(store: DataStore, id: UUID): UserWithoutPassword | null {
 		const { users } = store.getState();
 
 		const user = users.find(user => user.id === id);
@@ -41,7 +25,21 @@ export const userRepository = {
 
 		const { password, ...userWithoutPassword } = user;
 
-		return userWithoutPassword as UserWithoutPassword;
+		return userWithoutPassword;
+	},
+
+	isUserExists(
+		store: DataStore,
+		{
+			email,
+			username,
+		}: { email?: string; username?: string; andOperator?: boolean },
+	) {
+		const { users } = store.getState();
+
+		return users.some(
+			user => user.email === email || user.username === username,
+		);
 	},
 
 	getUserWithPassword(store: DataStore, id: UUID) {
