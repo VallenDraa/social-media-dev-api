@@ -1,5 +1,5 @@
 {
-	"name": "mock-development-api",
+	"name": "social-media-dev-api",
 	"version": "1.0.0",
 	"description": "Use this API for playing with frontend features that needs a mock REST API",
 	"main": "index.js",
@@ -22,6 +22,7 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@flydotio/dockerfile": "^0.5.4",
 		"@types/jest": "^29.5.12",
 		"@types/jsonwebtoken": "^9.0.6",
 		"@types/supertest": "^6.0.2",
