@@ -11,6 +11,8 @@ export const createServer = async (isTest: boolean) => {
 		routes: {
 			cors: {
 				origin: ['*'],
+				headers: ['Authorization', 'Content-Type'],
+				credentials: true,
 			},
 		},
 	});
