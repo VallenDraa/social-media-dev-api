@@ -1,6 +1,6 @@
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import { type UserWithoutPassword } from 'src/v1/models';
-import { createFakeUserExample } from 'src/v1/utils/fake-data';
+import { createFakeUserWithoutPasswordExample } from 'src/v1/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
@@ -72,7 +72,7 @@ export const authSwagger: Record<
 			'200': {
 				description: 'Returns user detail.',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'Successfully get current user details',
 				),
 			},
