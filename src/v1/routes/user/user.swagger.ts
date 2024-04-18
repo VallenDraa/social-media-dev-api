@@ -7,7 +7,7 @@ import type {
 	UserWithoutPassword,
 } from 'src/v1/models';
 import { emptyArray } from 'src/v1/utils/array-utils';
-import { createFakeUserExample } from 'src/v1/utils/fake-data';
+import { createFakeUserWithoutPasswordExample } from 'src/v1/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
@@ -31,7 +31,7 @@ export const usersSwagger: Record<
 			'201': {
 				description: 'Returns the newly created user',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'User created successfully',
 					201,
 				),
@@ -56,7 +56,7 @@ export const usersSwagger: Record<
 					metadata: MetaData;
 				}>(
 					{
-						users: emptyArray(3, createFakeUserExample),
+						users: emptyArray(3, createFakeUserWithoutPasswordExample),
 						metadata: { currentPage: 1, lastPage: 1, limit: 3, total: 3 },
 					},
 					'Users fetched successfully',
@@ -78,7 +78,7 @@ export const usersSwagger: Record<
 			'200': {
 				description: 'Returns a single user from the given id.',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'User fetched successfully',
 				),
 			},
@@ -98,7 +98,7 @@ export const usersSwagger: Record<
 			'200': {
 				description: 'Edits an existing user.',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'User updated successfully',
 				),
 			},

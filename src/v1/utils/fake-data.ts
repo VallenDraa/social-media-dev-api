@@ -131,11 +131,6 @@ export const createFakeUserWithoutPasswordExample =
 	createFakeUserWithoutPassword;
 
 /**
- * @returns Fake user for swagger example response
- */
-export const createFakeUserExample = createFakeUser;
-
-/**
  * @returns Fake post for swagger example response
  */
 export const createFakePostExample = (): Post => ({
