@@ -1,11 +1,7 @@
 import { type Server } from '@hapi/hapi';
-import {
-	swaggerPlugin,
-	authPlugin,
-	loggerPlugin,
-	routerPlugin,
-} from 'src/v1/plugins';
+import { swaggerPlugin, authPlugin, loggerPlugin } from 'src/v1/plugins';
 import { dataStore, refreshStore, seedStoreInit } from 'src/v1/store';
+import { allRoutes } from './routes';
 
 export const v1Init = async (server: Server, isTest: boolean) => {
 	seedStoreInit();
@@ -19,5 +15,5 @@ export const v1Init = async (server: Server, isTest: boolean) => {
 	}
 
 	await authPlugin(server, dataStore);
-	await routerPlugin(server);
+	server.route(allRoutes);
 };

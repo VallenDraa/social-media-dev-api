@@ -9,11 +9,7 @@ export const createServer = async (isTest: boolean) => {
 		port: process.env.PORT,
 		host: process.env.HOST,
 		routes: {
-			cors: {
-				origin: ['*'],
-				headers: ['Authorization', 'Content-Type'],
-				credentials: true,
-			},
+			cors: { origin: ['*'], credentials: true },
 		},
 	});
 

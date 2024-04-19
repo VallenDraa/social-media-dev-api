@@ -42,7 +42,7 @@ export const authSwagger: Record<
 		responses: {
 			'200': {
 				description:
-					'Returns status code with access token and refresh token. The access token will be sent via cookie and response body.',
+					'Returns status code with access token and refresh token (Both are sent in response body ang cookies).',
 				schema: apiResponse<{ accessToken: string; refreshToken: string }>(
 					{
 						accessToken: crypto.randomUUID(),
@@ -98,7 +98,7 @@ export const authSwagger: Record<
 	'POST /auth/refresh-token': {
 		responses: {
 			'200': {
-				description: 'Returns new access token.',
+				description: 'Returns new access token via response body and cookies.',
 				schema: apiResponse<{ accessToken: string }>(
 					{ accessToken: crypto.randomUUID() },
 					'Successfully refreshed access token',
@@ -121,7 +121,7 @@ export const authSwagger: Record<
 	'GET /auth/refresh-token/cookie': {
 		responses: {
 			'200': {
-				description: 'Returns new access token.',
+				description: 'Returns new access token via response body and cookies.',
 				schema: apiResponse<{ accessToken: string }>(
 					{ accessToken: crypto.randomUUID() },
 					'Successfully refreshed access token',
@@ -144,7 +144,8 @@ export const authSwagger: Record<
 	'GET /auth/logout': {
 		responses: {
 			'200': {
-				description: 'Returns successful message.',
+				description:
+					'Deletes access and refresh tokens from cookies and returns successful message.',
 				schema: apiResponse<null>(null, 'Logout successful'),
 			},
 			'500': { schema: serverErrorApiResponse },
