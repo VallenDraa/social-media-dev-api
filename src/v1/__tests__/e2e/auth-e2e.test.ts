@@ -12,7 +12,10 @@ import { registerDataMock } from 'src/v1/__tests__/mocks';
 import type TestAgent from 'supertest/lib/agent';
 import { type Server } from '@hapi/hapi';
 import { dataStore } from 'src/v1/store';
-import { REFRESH_TOKEN_COOKIE_NAME } from 'src/v1/utils/jwt';
+import {
+	ACCESS_TOKEN_COOKIE_NAME,
+	REFRESH_TOKEN_COOKIE_NAME,
+} from 'src/v1/utils/jwt';
 
 describe('Auth e2e', () => {
 	let agent: TestAgent;
@@ -25,10 +28,37 @@ describe('Auth e2e', () => {
 
 	afterAll(() => serverListener.close());
 
-	const getRefreshTokenCookie = (response: request.Response) =>
+	const getCookie = (response: request.Response, cookieName: string) =>
 		(response.header['set-cookie'] as unknown as string[])
-			.find(cookie => cookie.startsWith(REFRESH_TOKEN_COOKIE_NAME))
+			.find(cookie => cookie.startsWith(cookieName))
 			?.split(';')[0];
+
+		const getTokens = async () =>
+			agent
+				.post('/api/v1/auth/login')
+				.send({ email: 'fake@gmail.com', password: 'fake1234567' })
+				.then(response => {
+					const body = response.body as ApiResponse<{
+						accessToken: string;
+						refreshToken: string;
+					}>;
+
+					const refreshTokenCookie = getCookie(
+						response,
+						REFRESH_TOKEN_COOKIE_NAME,
+					);
+					const accessTokenCookie = getCookie(
+						response,
+						ACCESS_TOKEN_COOKIE_NAME,
+					);
+
+					return {
+						accessToken: body.data.accessToken,
+						refreshToken: body.data.refreshToken,
+						accessTokenCookie,
+						refreshTokenCookie,
+					};
+				});
 
 	describe('POST /auth/register', () => {
 		const sendRegisterData = (data: object, status: number) =>
@@ -182,11 +212,16 @@ describe('Auth e2e', () => {
 					refreshToken: string;
 				}>;
 
-				const refreshToken = getRefreshTokenCookie(response);
+				const refreshTokenCookie = getCookie(
+					response,
+					REFRESH_TOKEN_COOKIE_NAME,
+				);
+				const accessTokenCookie = getCookie(response, ACCESS_TOKEN_COOKIE_NAME);
 
 				expect(body.statusCode).toStrictEqual(200);
 				expect(body.message).toStrictEqual('Login successful');
-				expect(typeof refreshToken).toStrictEqual('string');
+				expect(typeof refreshTokenCookie).toStrictEqual('string');
+				expect(typeof accessTokenCookie).toStrictEqual('string');
 				expect(typeof body.data.accessToken).toStrictEqual('string');
 				expect(typeof body.data.refreshToken).toStrictEqual('string');
 			});
@@ -312,24 +347,7 @@ describe('Auth e2e', () => {
 	});
 
 	describe('POST /auth/refresh-token', () => {
-		const getTokens = async () =>
-			agent
-				.post('/api/v1/auth/login')
-				.send({ email: 'fake@gmail.com', password: 'fake1234567' })
-				.then(response => {
-					const body = response.body as ApiResponse<{
-						accessToken: string;
-						refreshToken: string;
-					}>;
 
-					const refreshTokenCookie = getRefreshTokenCookie(response);
-
-					return {
-						accessToken: body.data.accessToken,
-						refreshToken: body.data.refreshToken,
-						refreshTokenCookie,
-					};
-				});
 
 		it("Should return 401 status code if 'refreshToken' from payload is invalid or expired", async () => {
 			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
@@ -371,7 +389,9 @@ describe('Auth e2e', () => {
 					expect(typeof body.data.accessToken).toStrictEqual('string');
 				});
 		});
+	});
 
+	describe('GET /auth/refresh-token/cookie', () => {
 		it("Should return 401 status code if 'refreshToken' from cookie is invalid or expired", async () => {
 			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
 			const expiredRefreshToken = jwt.sign(

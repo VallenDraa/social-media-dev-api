@@ -49,7 +49,7 @@ export const seedStore = (
 				id: '5d46479a-c622-4450-8345-9c8aa5344ac5',
 				username: 'admin',
 				email: 'admin@admin.com',
-				password: 'password1234567890',
+				password: 'test12345',
 				profilePicture: faker.image.avatar(),
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),

@@ -11,11 +11,19 @@ export type TokenCreationOptions = {
 	options?: jwt.SignOptions;
 };
 
+export const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
+export const ACCESS_TOKEN_COOKIE_OPTIONS: ServerStateCookieOptions = {
+	isSameSite: 'None',
+	isSecure: process.env.NODE_ENV === 'production',
+	ttl: 1000 * 60 * 5, // 5 minutes
+	isHttpOnly: true,
+};
+
 export const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
 export const REFRESH_TOKEN_COOKIE_OPTIONS: ServerStateCookieOptions = {
 	isSameSite: 'None',
 	isSecure: process.env.NODE_ENV === 'production',
-	ttl: 60 * 60 * 24 * 30 * 1000, // 1 month
+	ttl: 1000 * 60 * 60 * 24 * 30, // 1 month
 	isHttpOnly: true,
 };
 
