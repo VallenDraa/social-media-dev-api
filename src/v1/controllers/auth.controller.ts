@@ -5,14 +5,14 @@ import {
 	type UserWithoutPassword,
 	type AccessToken,
 	type RegisterData,
-	type RefreshTokenPayload,
 } from 'src/v1/models';
 import { authService } from 'src/v1/services';
 import {
 	ACCESS_TOKEN_COOKIE_NAME,
-	ACCESS_TOKEN_COOKIE_OPTIONS,
 	REFRESH_TOKEN_COOKIE_NAME,
-	REFRESH_TOKEN_COOKIE_OPTIONS,
+	createAccessTokenOptions,
+	createRefreshTokenOptions,
+	getAuthorizationToken,
 } from 'src/v1/utils/jwt';
 
 export const authController = {
@@ -34,13 +34,13 @@ export const authController = {
 				.state(
 					REFRESH_TOKEN_COOKIE_NAME,
 					refreshToken,
-					REFRESH_TOKEN_COOKIE_OPTIONS,
+					createRefreshTokenOptions(request.info.hostname),
 				)
 				// Set access token cookie
 				.state(
 					ACCESS_TOKEN_COOKIE_NAME,
 					accessToken,
-					ACCESS_TOKEN_COOKIE_OPTIONS,
+					createAccessTokenOptions(request.info.hostname),
 				)
 		);
 	},
@@ -52,7 +52,10 @@ export const authController = {
 			data: null,
 		};
 
-		return h.response(response).unstate(REFRESH_TOKEN_COOKIE_NAME);
+		return h
+			.response(response)
+			.unstate(REFRESH_TOKEN_COOKIE_NAME)
+			.unstate(ACCESS_TOKEN_COOKIE_NAME);
 	},
 
 	register(request: Request, h: ResponseToolkit) {
@@ -69,7 +72,9 @@ export const authController = {
 	},
 
 	refreshToken(request: Request, h: ResponseToolkit) {
-		const { refreshToken } = request.payload as RefreshTokenPayload;
+		const refreshToken = getAuthorizationToken(
+			request.headers.authorization as string,
+		);
 
 		const newAccessToken = authService.refreshToken(refreshToken);
 
@@ -86,7 +91,7 @@ export const authController = {
 				.state(
 					ACCESS_TOKEN_COOKIE_NAME,
 					newAccessToken,
-					ACCESS_TOKEN_COOKIE_OPTIONS,
+					createAccessTokenOptions(request.info.hostname),
 				)
 		);
 	},
@@ -109,7 +114,7 @@ export const authController = {
 			.state(
 				ACCESS_TOKEN_COOKIE_NAME,
 				newAccessToken,
-				ACCESS_TOKEN_COOKIE_OPTIONS,
+				createAccessTokenOptions(request.info.hostname),
 			);
 	},
 

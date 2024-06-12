@@ -12,20 +12,28 @@ export type TokenCreationOptions = {
 };
 
 export const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
-export const ACCESS_TOKEN_COOKIE_OPTIONS: ServerStateCookieOptions = {
+export const createAccessTokenOptions = (
+	domain: string,
+): ServerStateCookieOptions => ({
 	isSameSite: 'None',
-	isSecure: process.env.NODE_ENV === 'production',
+	isSecure: true,
 	ttl: 1000 * 60 * 5, // 5 minutes
 	isHttpOnly: true,
-};
+	path: '/',
+	domain,
+});
 
 export const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
-export const REFRESH_TOKEN_COOKIE_OPTIONS: ServerStateCookieOptions = {
+export const createRefreshTokenOptions = (
+	domain: string,
+): ServerStateCookieOptions => ({
 	isSameSite: 'None',
-	isSecure: process.env.NODE_ENV === 'production',
+	isSecure: true,
 	ttl: 1000 * 60 * 60 * 24 * 30, // 1 month
 	isHttpOnly: true,
-};
+	path: '/',
+	domain,
+});
 
 export const createAccessToken = ({
 	userId,
@@ -64,4 +72,18 @@ export const validateRefreshToken = (refreshToken: string) => {
 	}
 
 	return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+};
+
+export const getAuthorizationToken = (authorizationHeader: string) => {
+	if (!authorizationHeader) {
+		return null;
+	}
+
+	const [_bearerKeyword, token] = authorizationHeader.split(' ');
+
+	if (!token) {
+		return null;
+	}
+
+	return token;
 };

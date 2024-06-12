@@ -60,7 +60,7 @@ export const authService = {
 		friendRepository.createFriendsList(dataStore, newUser);
 	},
 
-	refreshToken(refreshToken: string) {
+	refreshToken(refreshToken: string | null) {
 		if (!refreshToken) {
 			throw Boom.badRequest('Refresh token is required');
 		}

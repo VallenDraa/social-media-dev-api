@@ -1,6 +1,6 @@
 import Hapi from '@hapi/hapi';
 import dotenv from 'dotenv';
-import { v1Init } from './v1/v1-init';
+import { v1Init } from 'src/v1';
 
 export const createServer = async (isTest: boolean) => {
 	dotenv.config();

@@ -16,7 +16,7 @@ export const authSwagger: Record<
 	| 'POST /auth/login'
 	| 'GET /auth/logout'
 	| 'GET /auth/me'
-	| 'POST /auth/refresh-token'
+	| 'GET /auth/refresh-token'
 	| 'GET /auth/refresh-token/cookie',
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
 > = {
@@ -95,7 +95,7 @@ export const authSwagger: Record<
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
-	'POST /auth/refresh-token': {
+	'GET /auth/refresh-token': {
 		responses: {
 			'200': {
 				description: 'Returns new access token via response body and cookies.',
