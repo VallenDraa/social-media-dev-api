@@ -18,7 +18,7 @@ import {
 	createRefreshToken,
 	validateRefreshToken,
 } from 'src/v1/utils/jwt';
-import { TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export const authService = {
 	login(loginData: Login) {
@@ -49,9 +49,9 @@ export const authService = {
 		const newUser: User = {
 			id: crypto.randomUUID(),
 			...dataWithoutConfirmPassword,
-			profilePicture: `https://ui-avatars.com/api/?name=${registerData.username
-				.split(' ')
-				.join('+')}&background=random`,
+			profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+				registerData.username.split(' ').join('+'),
+			)}&background=random`,
 			createdAt,
 			updatedAt: createdAt,
 		};
@@ -71,7 +71,7 @@ export const authService = {
 
 			return newAccessToken;
 		} catch (error) {
-			if (error instanceof TokenExpiredError) {
+			if (error instanceof jwt.TokenExpiredError) {
 				throw Boom.unauthorized('Refresh token expired');
 			}
 
