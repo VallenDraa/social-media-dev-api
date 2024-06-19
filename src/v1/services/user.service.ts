@@ -33,14 +33,24 @@ export const userService = {
 		return userWithoutPassword;
 	},
 
-	getUsers(limit = 10, page = 1) {
-		const users = userRepository.getUsers(dataStore);
+	getUsers(keyword = '', limit = 10, page = 1) {
+		const users = userRepository.getUsers(dataStore, keyword);
 
 		return paginateService.paginate(users, limit, page);
 	},
 
 	getUserById(id: crypto.UUID) {
 		const user = userRepository.getUserById(dataStore, id);
+
+		if (!user) {
+			throw Boom.notFound('User not found!');
+		}
+
+		return user;
+	},
+
+	getUserByUsername(username: string) {
+		const user = userRepository.getUserByUsername(dataStore, username);
 
 		if (!user) {
 			throw Boom.notFound('User not found!');

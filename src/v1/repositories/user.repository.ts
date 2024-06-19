@@ -7,17 +7,41 @@ export const userRepository = {
 		store.setState(state => ({ ...state, users: [user, ...state.users] }));
 	},
 
-	getUsers: (store: DataStore) =>
-		store.getState().users.map(user => {
-			const { password, ...userWithoutPassword } = user;
+	getUsers(store: DataStore, keyword: string): UserWithoutPassword[] {
+		const { users } = store.getState();
 
-			return userWithoutPassword as UserWithoutPassword;
-		}),
+		const userResults = users
+			.filter(user => user.username.includes(keyword))
+			.map(user => {
+				const { password, ...userWithoutPassword } = user;
+
+				return userWithoutPassword;
+			});
+
+		return userResults;
+	},
 
 	getUserById(store: DataStore, id: UUID): UserWithoutPassword | null {
 		const { users } = store.getState();
 
 		const user = users.find(user => user.id === id);
+
+		if (!user) {
+			return null;
+		}
+
+		const { password, ...userWithoutPassword } = user;
+
+		return userWithoutPassword;
+	},
+
+	getUserByUsername(
+		store: DataStore,
+		username: string,
+	): UserWithoutPassword | null {
+		const { users } = store.getState();
+
+		const user = users.find(user => user.username === username);
 
 		if (!user) {
 			return null;

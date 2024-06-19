@@ -63,7 +63,11 @@ describe('User e2e', () => {
 
 	afterAll(() => serverListener.close());
 
-	const getUsers = (page?: number | string, limit?: number | string) => {
+	const getUsers = (
+		page?: number | string,
+		limit?: number | string,
+		keyword?: string,
+	) => {
 		const query = new URLSearchParams();
 
 		if (page) {
@@ -72,6 +76,10 @@ describe('User e2e', () => {
 
 		if (limit) {
 			query.set('limit', limit.toString());
+		}
+
+		if (keyword) {
+			query.set('keyword', keyword);
 		}
 
 		return agent
@@ -94,6 +102,20 @@ describe('User e2e', () => {
 					}>;
 
 					expect(body.data.users).toHaveLength(10);
+					expect(body.data.metadata.currentPage).toStrictEqual(1);
+				});
+		});
+
+		it('Should return some users with a similar username to the provided keyword', async () => {
+			await getUsers(1, 10, 'fake')
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{
+						users: UserWithoutPassword[];
+						metadata: MetaData;
+					}>;
+
+					expect(body.data.users.length).toBeGreaterThan(0);
 					expect(body.data.metadata.currentPage).toStrictEqual(1);
 				});
 		});
@@ -263,21 +285,15 @@ describe('User e2e', () => {
 				.set('Authorization', `Bearer ${accessToken}`);
 
 		it('Should return user when found', async () => {
-			const validUserId = await agent
-				.get('/api/v1/users')
-				.set('Authorization', `Bearer ${accessToken}`)
-				.expect(200)
-				.then(
-					res => (res.body as ApiResponse<{ users: User[] }>).data.users[0].id,
-				);
+			const validUser = await getValidUser();
 
-			await getUserById(validUserId)
+			await getUserById(validUser.id)
 				.expect(200)
 				.then(res => {
 					const body = res.body as ApiResponse<{ user: User }>;
 					expect(body.statusCode).toStrictEqual(200);
 					expect(body.message).toStrictEqual('User fetched successfully');
-					expect(body.data.user.id).toStrictEqual(validUserId);
+					expect(body.data.user.id).toStrictEqual(validUser.id);
 				});
 		});
 
@@ -285,6 +301,40 @@ describe('User e2e', () => {
 			const invalidId = crypto.randomUUID();
 
 			await getUserById(invalidId)
+				.expect(404)
+				.then(res => {
+					const body = res.body as ErrorApiResponse;
+
+					expect(body.statusCode).toStrictEqual(404);
+					expect(body.error).toStrictEqual('Not Found');
+					expect(body.message).toStrictEqual('User not found!');
+				});
+		});
+	});
+
+	describe('GET /users/username/:username', () => {
+		const getUserByUsername = (username: string) =>
+			agent
+				.get(`/api/v1/users/username/${username}`)
+				.set('Authorization', `Bearer ${accessToken}`);
+
+		it('Should return user when found', async () => {
+			const validUser = await getValidUser();
+
+			await getUserByUsername(validUser.username)
+				.expect(200)
+				.then(res => {
+					const body = res.body as ApiResponse<{ user: User }>;
+					expect(body.statusCode).toStrictEqual(200);
+					expect(body.message).toStrictEqual('User fetched successfully');
+					expect(body.data.user.username).toStrictEqual(validUser.username);
+				});
+		});
+
+		it('Should return 404 when user is not found', async () => {
+			const invalidUsername = crypto.randomUUID(); // Because nobody has a UUID for a username
+
+			await getUserByUsername(invalidUsername)
 				.expect(404)
 				.then(res => {
 					const body = res.body as ErrorApiResponse;
