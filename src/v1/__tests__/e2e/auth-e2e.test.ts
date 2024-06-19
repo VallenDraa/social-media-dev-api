@@ -33,32 +33,29 @@ describe('Auth e2e', () => {
 			.find(cookie => cookie.startsWith(cookieName))
 			?.split(';')[0];
 
-		const getTokens = async () =>
-			agent
-				.post('/api/v1/auth/login')
-				.send({ email: 'fake@gmail.com', password: 'fake1234567' })
-				.then(response => {
-					const body = response.body as ApiResponse<{
-						accessToken: string;
-						refreshToken: string;
-					}>;
+	const getTokens = async () =>
+		agent
+			.post('/api/v1/auth/login')
+			.send({ email: 'fake@gmail.com', password: 'fake1234567' })
+			.then(response => {
+				const body = response.body as ApiResponse<{
+					accessToken: string;
+					refreshToken: string;
+				}>;
 
-					const refreshTokenCookie = getCookie(
-						response,
-						REFRESH_TOKEN_COOKIE_NAME,
-					);
-					const accessTokenCookie = getCookie(
-						response,
-						ACCESS_TOKEN_COOKIE_NAME,
-					);
+				const refreshTokenCookie = getCookie(
+					response,
+					REFRESH_TOKEN_COOKIE_NAME,
+				);
+				const accessTokenCookie = getCookie(response, ACCESS_TOKEN_COOKIE_NAME);
 
-					return {
-						accessToken: body.data.accessToken,
-						refreshToken: body.data.refreshToken,
-						accessTokenCookie,
-						refreshTokenCookie,
-					};
-				});
+				return {
+					accessToken: body.data.accessToken,
+					refreshToken: body.data.refreshToken,
+					accessTokenCookie,
+					refreshTokenCookie,
+				};
+			});
 
 	describe('POST /auth/register', () => {
 		const sendRegisterData = (data: object, status: number) =>
@@ -347,8 +344,6 @@ describe('Auth e2e', () => {
 	});
 
 	describe('POST /auth/refresh-token', () => {
-
-
 		it("Should return 401 status code if 'refreshToken' from payload is invalid or expired", async () => {
 			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
 			const expiredRefreshToken = jwt.sign(
@@ -358,9 +353,8 @@ describe('Auth e2e', () => {
 			);
 
 			await agent
-				.post('/api/v1/auth/refresh-token')
-				.send({ refreshToken: expiredRefreshToken })
-				.expect(401)
+				.get('/api/v1/auth/refresh-token')
+				.set('Authorization', `Bearer ${expiredRefreshToken}`)
 				.then(response => {
 					const body = response.body as ErrorApiResponse;
 
@@ -376,8 +370,8 @@ describe('Auth e2e', () => {
 			);
 
 			await agent
-				.post('/api/v1/auth/refresh-token')
-				.send({ refreshToken })
+				.get('/api/v1/auth/refresh-token')
+				.set('Authorization', `Bearer ${refreshToken}`)
 				.expect(200)
 				.then(response => {
 					const body = response.body as ApiResponse<{ accessToken: string }>;
