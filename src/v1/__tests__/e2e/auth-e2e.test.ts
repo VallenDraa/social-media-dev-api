@@ -343,7 +343,7 @@ describe('Auth e2e', () => {
 		});
 	});
 
-	describe('POST /auth/refresh-token', () => {
+	describe('GET /auth/refresh-token', () => {
 		it("Should return 401 status code if 'refreshToken' from payload is invalid or expired", async () => {
 			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
 			const expiredRefreshToken = jwt.sign(
