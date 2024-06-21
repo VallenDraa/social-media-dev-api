@@ -1,6 +1,6 @@
 {
 	"name": "social-media-dev-api",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "Use this API for playing with frontend features that needs a mock REST API",
 	"main": "index.js",
 	"type": "module",
