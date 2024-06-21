@@ -8,13 +8,17 @@ import {
 	type AccessToken,
 	type User,
 } from 'src/v1/models';
-import { authRepository, friendRepository } from 'src/v1/repositories';
+import {
+	authRepository,
+	friendRepository,
+	userRepository,
+} from 'src/v1/repositories';
 import {
 	createAccessToken,
 	createRefreshToken,
 	validateRefreshToken,
 } from 'src/v1/utils/jwt';
-import { TokenExpiredError } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export const authService = {
 	login(loginData: Login) {
@@ -24,17 +28,19 @@ export const authService = {
 			throw Boom.unauthorized('Invalid email or password');
 		}
 
-		const accessToken = createAccessToken({ userId: user.id });
-		const refreshToken = createRefreshToken({
-			userId: user.id,
-		});
-
-		return { accessToken, refreshToken };
+		return {
+			accessToken: createAccessToken({ userId: user.id }),
+			refreshToken: createRefreshToken({ userId: user.id }),
+		};
 	},
 
 	register(registerData: RegisterData) {
 		if (registerData.password !== registerData.confirmPassword) {
 			throw Boom.badRequest('Password and confirm password do not match');
+		}
+
+		if (userRepository.isUserExists(dataStore, registerData)) {
+			throw Boom.badRequest('User already exists');
 		}
 
 		const { confirmPassword, ...dataWithoutConfirmPassword } = registerData;
@@ -43,23 +49,18 @@ export const authService = {
 		const newUser: User = {
 			id: crypto.randomUUID(),
 			...dataWithoutConfirmPassword,
-			profilePicture: `https://ui-avatars.com/api/?name=${registerData.username
-				.split(' ')
-				.join('+')}&background=random`,
+			profilePicture: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+				registerData.username.split(' ').join('+'),
+			)}&background=random`,
 			createdAt,
 			updatedAt: createdAt,
 		};
 
-		const isRegistered = authRepository.register(dataStore, newUser);
-
-		if (!isRegistered) {
-			throw Boom.badRequest('User already exists');
-		}
-
+		authRepository.register(dataStore, newUser);
 		friendRepository.createFriendsList(dataStore, newUser);
 	},
 
-	refreshToken(refreshToken: string) {
+	refreshToken(refreshToken: string | null) {
 		if (!refreshToken) {
 			throw Boom.badRequest('Refresh token is required');
 		}
@@ -70,7 +71,7 @@ export const authService = {
 
 			return newAccessToken;
 		} catch (error) {
-			if (error instanceof TokenExpiredError) {
+			if (error instanceof jwt.TokenExpiredError) {
 				throw Boom.unauthorized('Refresh token expired');
 			}
 

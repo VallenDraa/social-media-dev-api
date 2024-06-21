@@ -74,15 +74,15 @@ export const authRoutes: ServerRoute[] = [
 	},
 	{
 		path: '/auth/refresh-token',
-		method: 'POST',
+		method: 'GET',
 		options: {
 			auth: false,
-			description: 'Refresh Token With Body',
+			description: 'Refresh Token With authorization header',
 			notes:
-				'Send a refresh token via the request body to get new access token.',
+				'Send a refresh token via the authorization header to get new access token.',
 			tags: ['api', 'auth'],
-			plugins: { 'hapi-swagger': authSwagger['POST /auth/refresh-token'] },
-			validate: { failAction, payload: refreshTokenValidator },
+			plugins: { 'hapi-swagger': authSwagger['GET /auth/refresh-token'] },
+			validate: { failAction, headers: authorizationValidator },
 		},
 		handler: authController.refreshToken,
 	},

@@ -58,7 +58,7 @@ export const authorizationValidator = Joi.object<AuthorizationPayload, true>({
 	authorization: Joi.string()
 		.trim()
 		.required()
-		.messages({ 'any.required': 'Access token is invalid or missing' }),
+		.messages({ 'any.required': 'Authorization token is invalid or missing' }),
 })
 	.unknown(true)
 	.label('AuthorizationHeader');

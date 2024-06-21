@@ -7,7 +7,7 @@ import type {
 	UserWithoutPassword,
 } from 'src/v1/models';
 import { emptyArray } from 'src/v1/utils/array-utils';
-import { createFakeUserExample } from 'src/v1/utils/fake-data';
+import { createFakeUserWithoutPasswordExample } from 'src/v1/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
@@ -20,6 +20,7 @@ export const usersSwagger: Record<
 	| 'POST /users'
 	| 'GET /users'
 	| 'GET /users/{id}'
+	| 'GET /users/username/{username}'
 	| 'PUT /users/{id}'
 	| 'PUT /users/{id}/password'
 	| 'DELETE /users/{id}',
@@ -31,7 +32,7 @@ export const usersSwagger: Record<
 			'201': {
 				description: 'Returns the newly created user',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'User created successfully',
 					201,
 				),
@@ -56,7 +57,7 @@ export const usersSwagger: Record<
 					metadata: MetaData;
 				}>(
 					{
-						users: emptyArray(3, createFakeUserExample),
+						users: emptyArray(3, createFakeUserWithoutPasswordExample),
 						metadata: { currentPage: 1, lastPage: 1, limit: 3, total: 3 },
 					},
 					'Users fetched successfully',
@@ -78,7 +79,7 @@ export const usersSwagger: Record<
 			'200': {
 				description: 'Returns a single user from the given id.',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'User fetched successfully',
 				),
 			},
@@ -92,13 +93,33 @@ export const usersSwagger: Record<
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
+	'GET /users/username/{username}': {
+		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
+		responses: {
+			'200': {
+				description: 'Returns a single user from the given username.',
+				schema: apiResponse<{ user: UserWithoutPassword }>(
+					{ user: createFakeUserWithoutPasswordExample() },
+					'User fetched successfully',
+				),
+			},
+			'404': {
+				description: 'Happens when the given username is missing.',
+				schema: notFoundApiResponse('User not found!'),
+			},
+			'500': { schema: serverErrorApiResponse },
+		},
+		order: 4,
+		produces: ['application/json'],
+		payloadType: 'json',
+	},
 	'PUT /users/{id}': {
 		security: [{ [SWAGGER_SECURITY_DEFINITION]: [] }],
 		responses: {
 			'200': {
 				description: 'Edits an existing user.',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'User updated successfully',
 				),
 			},
@@ -108,7 +129,7 @@ export const usersSwagger: Record<
 			},
 			'500': { schema: serverErrorApiResponse },
 		},
-		order: 4,
+		order: 5,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
@@ -142,7 +163,7 @@ export const usersSwagger: Record<
 			},
 			'500': { schema: serverErrorApiResponse },
 		},
-		order: 5,
+		order: 6,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
@@ -162,7 +183,7 @@ export const usersSwagger: Record<
 			},
 			'500': { schema: serverErrorApiResponse },
 		},
-		order: 6,
+		order: 7,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},

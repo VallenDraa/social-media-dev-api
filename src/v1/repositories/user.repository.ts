@@ -4,33 +4,24 @@ import { type DataStore } from 'src/v1/store';
 
 export const userRepository = {
 	addUser(store: DataStore, user: User) {
-		let isAdded = false;
-		const { users } = store.getState();
-
-		// Return early if the user already exists
-		if (
-			users.find(u => u.email === user.email || u.username === user.username)
-		) {
-			return isAdded;
-		}
-
-		isAdded = true;
-		store.setState(state => ({
-			...state,
-			users: [user, ...state.users],
-		}));
-
-		return isAdded;
+		store.setState(state => ({ ...state, users: [user, ...state.users] }));
 	},
 
-	getUsers: (store: DataStore) =>
-		store.getState().users.map(user => {
-			const { password, ...userWithoutPassword } = user;
+	getUsers(store: DataStore, keyword: string): UserWithoutPassword[] {
+		const { users } = store.getState();
 
-			return userWithoutPassword as UserWithoutPassword;
-		}),
+		const userResults = users
+			.filter(user => user.username.includes(keyword))
+			.map(user => {
+				const { password, ...userWithoutPassword } = user;
 
-	getUserById(store: DataStore, id: UUID) {
+				return userWithoutPassword;
+			});
+
+		return userResults;
+	},
+
+	getUserById(store: DataStore, id: UUID): UserWithoutPassword | null {
 		const { users } = store.getState();
 
 		const user = users.find(user => user.id === id);
@@ -41,7 +32,38 @@ export const userRepository = {
 
 		const { password, ...userWithoutPassword } = user;
 
-		return userWithoutPassword as UserWithoutPassword;
+		return userWithoutPassword;
+	},
+
+	getUserByUsername(
+		store: DataStore,
+		username: string,
+	): UserWithoutPassword | null {
+		const { users } = store.getState();
+
+		const user = users.find(user => user.username === username);
+
+		if (!user) {
+			return null;
+		}
+
+		const { password, ...userWithoutPassword } = user;
+
+		return userWithoutPassword;
+	},
+
+	isUserExists(
+		store: DataStore,
+		{
+			email,
+			username,
+		}: { email?: string; username?: string; andOperator?: boolean },
+	) {
+		const { users } = store.getState();
+
+		return users.some(
+			user => user.email === email || user.username === username,
+		);
 	},
 
 	getUserWithPassword(store: DataStore, id: UUID) {

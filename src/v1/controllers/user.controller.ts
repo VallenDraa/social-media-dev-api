@@ -24,9 +24,10 @@ export const userController = {
 	},
 
 	getUsers(req: Request, h: ResponseToolkit) {
-		const query = req.query as { page: number; limit: number };
+		const query = req.query as { keyword: string; page: number; limit: number };
 
 		const { data: users, metadata } = userService.getUsers(
+			query.keyword,
 			query.limit,
 			query.page,
 		);
@@ -47,6 +48,20 @@ export const userController = {
 		const params = req.params as { id: UUID };
 
 		const user = userService.getUserById(params.id);
+
+		const response: ApiResponse<{ user: UserWithoutPassword }> = {
+			statusCode: 200,
+			message: 'User fetched successfully',
+			data: { user },
+		};
+
+		return h.response(response).code(200);
+	},
+
+	getUserByUsername(req: Request, h: ResponseToolkit) {
+		const params = req.params as { username: string };
+
+		const user = userService.getUserByUsername(params.username);
 
 		const response: ApiResponse<{ user: UserWithoutPassword }> = {
 			statusCode: 200,

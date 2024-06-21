@@ -1,6 +1,6 @@
 import { type PluginSpecificConfiguration } from '@hapi/hapi';
 import { type UserWithoutPassword } from 'src/v1/models';
-import { createFakeUserExample } from 'src/v1/utils/fake-data';
+import { createFakeUserWithoutPasswordExample } from 'src/v1/utils/fake-data';
 import {
 	apiResponse,
 	badRequestApiResponse,
@@ -16,7 +16,7 @@ export const authSwagger: Record<
 	| 'POST /auth/login'
 	| 'GET /auth/logout'
 	| 'GET /auth/me'
-	| 'POST /auth/refresh-token'
+	| 'GET /auth/refresh-token'
 	| 'GET /auth/refresh-token/cookie',
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
 > = {
@@ -42,7 +42,7 @@ export const authSwagger: Record<
 		responses: {
 			'200': {
 				description:
-					'Returns status code with access token and refresh token. The access token will be sent via cookie and response body.',
+					'Returns status code with access token and refresh token (Both are sent in response body ang cookies).',
 				schema: apiResponse<{ accessToken: string; refreshToken: string }>(
 					{
 						accessToken: crypto.randomUUID(),
@@ -72,7 +72,7 @@ export const authSwagger: Record<
 			'200': {
 				description: 'Returns user detail.',
 				schema: apiResponse<{ user: UserWithoutPassword }>(
-					{ user: createFakeUserExample() },
+					{ user: createFakeUserWithoutPasswordExample() },
 					'Successfully get current user details',
 				),
 			},
@@ -95,10 +95,10 @@ export const authSwagger: Record<
 		produces: ['application/json'],
 		payloadType: 'json',
 	},
-	'POST /auth/refresh-token': {
+	'GET /auth/refresh-token': {
 		responses: {
 			'200': {
-				description: 'Returns new access token.',
+				description: 'Returns new access token via response body and cookies.',
 				schema: apiResponse<{ accessToken: string }>(
 					{ accessToken: crypto.randomUUID() },
 					'Successfully refreshed access token',
@@ -121,7 +121,7 @@ export const authSwagger: Record<
 	'GET /auth/refresh-token/cookie': {
 		responses: {
 			'200': {
-				description: 'Returns new access token.',
+				description: 'Returns new access token via response body and cookies.',
 				schema: apiResponse<{ accessToken: string }>(
 					{ accessToken: crypto.randomUUID() },
 					'Successfully refreshed access token',
@@ -144,7 +144,8 @@ export const authSwagger: Record<
 	'GET /auth/logout': {
 		responses: {
 			'200': {
-				description: 'Returns successful message.',
+				description:
+					'Deletes access and refresh tokens from cookies and returns successful message.',
 				schema: apiResponse<null>(null, 'Logout successful'),
 			},
 			'500': { schema: serverErrorApiResponse },

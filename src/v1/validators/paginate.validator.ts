@@ -6,6 +6,10 @@ export const paginateValidator = Joi.object({
 	page: Joi.number().min(1).example(1),
 }).label('Paginate');
 
+export const paginateValidatorWithSearch = paginateValidator
+	.append({ keyword: Joi.string().example('search') })
+	.label('PaginateWithSearch');
+
 export const metadataValidator = Joi.object<MetaData>({
 	currentPage: Joi.number().example(1),
 	lastPage: Joi.number().example(1),

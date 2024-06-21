@@ -8,6 +8,14 @@ import {
 	type UserWithoutPassword,
 } from 'src/v1/models';
 
+export const usernameValidator = Joi.object({
+	username: Joi.string()
+		.trim()
+		.required()
+		.messages({ 'any.required': 'Username is invalid or missing' })
+		.example(faker.internet.userName()),
+});
+
 export const createUserValidator = Joi.object<UserCreate, true>({
 	profilePicture: Joi.string()
 		.trim()

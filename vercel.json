@@ -1,6 +1,0 @@
-{
-  "version": 2,
-  "git": { "deploymentEnabled": false },
-  "builds": [{ "src": "dist/src/index.js", "use": "@vercel/node" }],
-  "rewrites": [{ "source": "/(.*)", "destination": "dist/src/index.js" }]
-}

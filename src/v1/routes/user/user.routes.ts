@@ -3,10 +3,11 @@ import { userController } from 'src/v1/controllers';
 import { failAction } from 'src/v1/utils/fail-action-response';
 import {
 	idValidator,
-	paginateValidator,
 	createUserValidator,
 	editUserPasswordValidator,
 	editUserValidator,
+	paginateValidatorWithSearch,
+	usernameValidator,
 } from 'src/v1/validators';
 import { usersSwagger } from './user.swagger';
 
@@ -16,12 +17,13 @@ export const userRoutes: ServerRoute[] = [
 		method: 'GET',
 		options: {
 			description: 'Get all users.',
-			notes: 'Gets all users in a paginated manner.',
+			notes:
+				'Gets all users in a paginated manner with an optional keyword search.',
 			tags: ['api', 'users'],
 			plugins: { 'hapi-swagger': usersSwagger['GET /users'] },
 			validate: {
 				failAction,
-				query: paginateValidator,
+				query: paginateValidatorWithSearch,
 			},
 		},
 		handler: userController.getUsers,
@@ -30,7 +32,7 @@ export const userRoutes: ServerRoute[] = [
 		path: '/users/{id}',
 		method: 'GET',
 		options: {
-			description: 'Get a single user.',
+			description: 'Get a single user by the user id.',
 			notes: 'Gets a single user from the given user id.',
 			tags: ['api', 'users'],
 			plugins: { 'hapi-swagger': usersSwagger['GET /users/{id}'] },
@@ -40,6 +42,23 @@ export const userRoutes: ServerRoute[] = [
 			},
 		},
 		handler: userController.getUserById,
+	},
+	{
+		path: '/users/username/{username}',
+		method: 'GET',
+		options: {
+			description: 'Get a single user by the username.',
+			notes: 'Gets a single user from the given username.',
+			tags: ['api', 'users'],
+			plugins: {
+				'hapi-swagger': usersSwagger['GET /users/username/{username}'],
+			},
+			validate: {
+				failAction,
+				params: usernameValidator,
+			},
+		},
+		handler: userController.getUserByUsername,
 	},
 	{
 		path: '/users',
