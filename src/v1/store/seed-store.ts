@@ -43,18 +43,15 @@ export const seedStore = (
 	store.setState(state => {
 		const users = emptyArray<User>(userAmount).map(() => createFakeUser());
 
-		// Add default user for manual testing in development
-		if (process.env.NODE_ENV === 'development') {
-			users.push({
-				id: '5d46479a-c622-4450-8345-9c8aa5344ac5',
-				username: 'admin',
-				email: 'admin@admin.com',
-				password: 'test12345',
-				profilePicture: faker.image.avatar(),
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			});
-		}
+		users.push({
+			id: '5d46479a-c622-4450-8345-9c8aa5344ac5',
+			username: 'admin',
+			email: 'admin@admin.com',
+			password: 'test12345',
+			profilePicture: faker.image.avatar(),
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		});
 
 		const usersId = users.map(user => user.id);
 		const friendsList = users.map(user =>
