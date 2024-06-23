@@ -110,19 +110,30 @@ export const createFakeFriendsList = ({
 }: {
 	user: User | UserWithoutPassword;
 	friendsPool: crypto.UUID[];
-}): FriendsList => ({
-	userId: user.id,
-	list: getRandomsFromArray(friendsPool).map(userId => ({
-		id: userId,
-		friendsSince: faker.date
-			.recent({ days: 60, refDate: new Date('2022-06-01') })
-			.toISOString(),
-	})),
-	createdAt: user.createdAt,
-	updatedAt: faker.date
-		.recent({ days: 30, refDate: new Date('2023-01-01') })
-		.toISOString(),
-});
+}): FriendsList => {
+	let lastFriendsSince = new Date(user.createdAt);
+
+	return {
+		userId: user.id,
+		list: getRandomsFromArray(friendsPool).map(userId => {
+			const friendsSince = faker.date
+				.soon({
+					days: faker.number.int({ min: 1, max: 360 }),
+					refDate: new Date(user.createdAt),
+				})
+				.toISOString();
+
+			lastFriendsSince =
+				lastFriendsSince > new Date(friendsSince)
+					? lastFriendsSince
+					: new Date(friendsSince);
+
+			return { id: userId, friendsSince };
+		}),
+		createdAt: user.createdAt,
+		updatedAt: new Date(lastFriendsSince).toISOString(),
+	};
+};
 
 /**
  * @returns Fake user without password for swagger example response

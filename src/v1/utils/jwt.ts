@@ -12,27 +12,23 @@ export type TokenCreationOptions = {
 };
 
 export const ACCESS_TOKEN_COOKIE_NAME = 'accessToken';
-export const createAccessTokenOptions = (
-	domain: string,
-): ServerStateCookieOptions => ({
-	isSameSite: 'None',
-	isSecure: true,
+export const createAccessTokenOptions = (): ServerStateCookieOptions => ({
+	isSameSite: process.env.NODE_ENV === 'development' ? 'Lax' : 'None',
+	isSecure: process.env.NODE_ENV === 'production',
+	domain: process.env.NODE_ENV === 'development' ? 'localhost' : undefined,
 	ttl: 1000 * 60 * 5, // 5 minutes
 	isHttpOnly: true,
 	path: '/',
-	domain,
 });
 
 export const REFRESH_TOKEN_COOKIE_NAME = 'refreshToken';
-export const createRefreshTokenOptions = (
-	domain: string,
-): ServerStateCookieOptions => ({
-	isSameSite: 'None',
-	isSecure: true,
+export const createRefreshTokenOptions = (): ServerStateCookieOptions => ({
+	isSameSite: process.env.NODE_ENV === 'development' ? 'Lax' : 'None',
+	isSecure: process.env.NODE_ENV === 'production',
+	domain: process.env.NODE_ENV === 'development' ? 'localhost' : undefined,
 	ttl: 1000 * 60 * 60 * 24 * 30, // 1 month
 	isHttpOnly: true,
 	path: '/',
-	domain,
 });
 
 export const createAccessToken = ({
