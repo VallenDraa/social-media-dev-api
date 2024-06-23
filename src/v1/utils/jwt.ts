@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { type AccessToken } from 'src/v1/models';
 import { type DataStore } from 'src/v1/store';
 import { type UUID } from 'node:crypto';
-import { type ServerStateCookieOptions } from '@hapi/hapi';
+import { type Request, type ServerStateCookieOptions } from '@hapi/hapi';
 
 export type TokenCreationOptions = {
 	userId: UUID;
@@ -70,16 +70,19 @@ export const validateRefreshToken = (refreshToken: string) => {
 	return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 };
 
-export const getAuthorizationToken = (authorizationHeader: string) => {
-	if (!authorizationHeader) {
-		return null;
+export const getRefreshToken = (request: Request) => {
+	const authorizationHeader = request.headers.authorization as string;
+
+	if (authorizationHeader) {
+		const [_bearerKeyword, refreshTokenFromHeader] =
+			authorizationHeader.split(' ');
+
+		return refreshTokenFromHeader || null;
 	}
 
-	const [_bearerKeyword, token] = authorizationHeader.split(' ');
+	const refreshTokenFromCookie = request.state[
+		REFRESH_TOKEN_COOKIE_NAME
+	] as string;
 
-	if (!token) {
-		return null;
-	}
-
-	return token;
+	return refreshTokenFromCookie || null;
 };

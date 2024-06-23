@@ -16,8 +16,7 @@ export const authSwagger: Record<
 	| 'POST /auth/login'
 	| 'GET /auth/logout'
 	| 'GET /auth/me'
-	| 'GET /auth/refresh-token'
-	| 'GET /auth/refresh-token/cookie',
+	| 'GET /auth/refresh-token',
 	NonNullable<PluginSpecificConfiguration['hapi-swagger']>
 > = {
 	'POST /auth/register': {
@@ -115,29 +114,6 @@ export const authSwagger: Record<
 			'500': { schema: serverErrorApiResponse },
 		},
 		order: 4,
-		produces: ['application/json'],
-		payloadType: 'json',
-	},
-	'GET /auth/refresh-token/cookie': {
-		responses: {
-			'200': {
-				description: 'Returns new access token via response body and cookies.',
-				schema: apiResponse<{ accessToken: string }>(
-					{ accessToken: crypto.randomUUID() },
-					'Successfully refreshed access token',
-				),
-			},
-			'400': {
-				description: 'Happens when refresh token is missing or invalid.',
-				schema: badRequestApiResponse('Refresh token is required'),
-			},
-			'401': {
-				description: 'Happens when refresh token is expired.',
-				schema: unauthorizedApiResponse('Refresh token expired'),
-			},
-			'500': { schema: serverErrorApiResponse },
-		},
-		order: 5,
 		produces: ['application/json'],
 		payloadType: 'json',
 	},

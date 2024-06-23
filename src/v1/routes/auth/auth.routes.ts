@@ -62,7 +62,7 @@ export const authRoutes: ServerRoute[] = [
 		options: {
 			description: 'Me',
 			notes:
-				'Send an access token here to get the current logged in user detail.',
+				'Send an access token here via header or cookies to get the current logged in user detail.',
 			tags: ['api', 'auth'],
 			plugins: { 'hapi-swagger': authSwagger['GET /auth/me'] },
 			validate: {
@@ -77,29 +77,14 @@ export const authRoutes: ServerRoute[] = [
 		method: 'GET',
 		options: {
 			auth: false,
-			description: 'Refresh Token With authorization header',
+			description:
+				'Refresh your access token by sending refresh token via authorization header or cookies',
 			notes:
-				'Send a refresh token via the authorization header to get new access token.',
+				'Send a refresh token via authorization header or cookies to get new access token.',
 			tags: ['api', 'auth'],
 			plugins: { 'hapi-swagger': authSwagger['GET /auth/refresh-token'] },
 			validate: { failAction, headers: authorizationValidator },
 		},
 		handler: authController.refreshToken,
-	},
-	{
-		path: '/auth/refresh-token/cookie',
-		method: 'GET',
-		options: {
-			auth: false,
-			description: 'Refresh Token With Cookies',
-			notes:
-				'Send a refresh token via cookies (obtained through login endpoint) to get new access token.',
-			tags: ['api', 'auth'],
-			plugins: {
-				'hapi-swagger': authSwagger['GET /auth/refresh-token/cookie'],
-			},
-			validate: { failAction, state: refreshTokenValidator },
-		},
-		handler: authController.refreshTokenCookie,
 	},
 ];
