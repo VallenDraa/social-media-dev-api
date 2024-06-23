@@ -383,9 +383,7 @@ describe('Auth e2e', () => {
 					expect(typeof body.data.accessToken).toStrictEqual('string');
 				});
 		});
-	});
 
-	describe('GET /auth/refresh-token/cookie', () => {
 		it("Should return 401 status code if 'refreshToken' from cookie is invalid or expired", async () => {
 			const userId = jwt.decode((await getTokens()).accessToken)!.sub as string;
 			const expiredRefreshToken = jwt.sign(
@@ -395,7 +393,7 @@ describe('Auth e2e', () => {
 			);
 
 			await agent
-				.get('/api/v1/auth/refresh-token/cookie')
+				.get('/api/v1/auth/refresh-token')
 				.set('Cookie', [`${REFRESH_TOKEN_COOKIE_NAME}=${expiredRefreshToken}`])
 				.expect(401)
 				.then(response => {
@@ -413,7 +411,7 @@ describe('Auth e2e', () => {
 			);
 
 			await agent
-				.get('/api/v1/auth/refresh-token/cookie')
+				.get('/api/v1/auth/refresh-token')
 				.set('Cookie', [refreshTokenCookie!])
 				// .expect(200)
 				.then(response => {

@@ -12,7 +12,7 @@ import {
 	REFRESH_TOKEN_COOKIE_NAME,
 	createAccessTokenOptions,
 	createRefreshTokenOptions,
-	getAuthorizationToken,
+	getRefreshToken,
 } from 'src/v1/utils/jwt';
 
 export const authController = {
@@ -72,9 +72,7 @@ export const authController = {
 	},
 
 	refreshToken(request: Request, h: ResponseToolkit) {
-		const refreshToken = getAuthorizationToken(
-			request.headers.authorization as string,
-		);
+		const refreshToken = getRefreshToken(request);
 
 		const newAccessToken = authService.refreshToken(refreshToken);
 
@@ -94,28 +92,6 @@ export const authController = {
 					createAccessTokenOptions(),
 				)
 		);
-	},
-
-	refreshTokenCookie(request: Request, h: ResponseToolkit) {
-		const refreshToken = (request.state as { refreshToken: string })[
-			REFRESH_TOKEN_COOKIE_NAME
-		];
-
-		const newAccessToken = authService.refreshToken(refreshToken);
-
-		const response: ApiResponse<{ accessToken: string }> = {
-			statusCode: 200,
-			message: 'Successfully refreshed access token',
-			data: { accessToken: newAccessToken },
-		};
-
-		return h
-			.response(response)
-			.state(
-				ACCESS_TOKEN_COOKIE_NAME,
-				newAccessToken,
-				createAccessTokenOptions(),
-			);
 	},
 
 	me(request: Request, h: ResponseToolkit) {
