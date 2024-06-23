@@ -26,7 +26,7 @@ describe('seedStore', () => {
 	it('Should have the right amount of data generated from the given amount in the env', () => {
 		const { comments, posts, users } = dataStore.getState();
 
-		expect(users.length).toBe(10);
+		expect(users.length).toBe(11); // 10 fake users + 1 default user
 		expect(posts.length).toBe(10);
 
 		// Comments will not have the same amount
