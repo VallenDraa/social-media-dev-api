@@ -34,13 +34,13 @@ export const authController = {
 				.state(
 					REFRESH_TOKEN_COOKIE_NAME,
 					refreshToken,
-					createRefreshTokenOptions(request.info.hostname),
+					createRefreshTokenOptions(),
 				)
 				// Set access token cookie
 				.state(
 					ACCESS_TOKEN_COOKIE_NAME,
 					accessToken,
-					createAccessTokenOptions(request.info.hostname),
+					createAccessTokenOptions(),
 				)
 		);
 	},
@@ -91,7 +91,7 @@ export const authController = {
 				.state(
 					ACCESS_TOKEN_COOKIE_NAME,
 					newAccessToken,
-					createAccessTokenOptions(request.info.hostname),
+					createAccessTokenOptions(),
 				)
 		);
 	},
@@ -114,7 +114,7 @@ export const authController = {
 			.state(
 				ACCESS_TOKEN_COOKIE_NAME,
 				newAccessToken,
-				createAccessTokenOptions(request.info.hostname),
+				createAccessTokenOptions(),
 			);
 	},
 
